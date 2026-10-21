@@ -1,0 +1,23 @@
+{
+  "store": "Chalak Mart (fictional Jhol test bench)",
+  "page": "/lab/chalak-mart.html",
+  "cheapest_product": { "name": "Cotton Crew Tee", "price": 499 },
+  "expected": {
+    "price_first_shown": 499,
+    "cart_subtotal": 558,
+    "final_total_if_shopper_changes_nothing_and_declines_upsell": 606,
+    "extra_paid": 107,
+    "extra_pct": 21.4
+  },
+  "planted": [
+    { "id": "P1", "pattern": "false_urgency", "page": "product", "what": "'Deal ends in' countdown restarts at 04:59 on every visit", "caught_by": "rule: 2 sessions ~2 min apart" },
+    { "id": "P2", "pattern": "false_urgency", "page": "product", "what": "'Only N left in stock' is random per visit (catch rate depends on the draw)", "caught_by": "rule: 2 sessions" },
+    { "id": "P3", "pattern": "basket_sneaking", "page": "cart", "what": "₹10 'Donation to Green India Fund' auto-added", "caught_by": "rule" },
+    { "id": "P4", "pattern": "basket_sneaking", "page": "cart", "what": "₹49 'Order Protection' pre-selected", "caught_by": "rule" },
+    { "id": "P5", "pattern": "subscription_trap", "page": "cart", "what": "ChalakPlus free trial pre-ticked; renews at ₹199/month in fine print", "caught_by": "rule" },
+    { "id": "P6", "pattern": "confirm_shaming", "page": "cart (upsell modal)", "what": "Decline text: 'No thanks, I don't mind if my order arrives broken'", "caught_by": "llm judge" },
+    { "id": "P7", "pattern": "interface_interference", "page": "cart (upsell modal)", "what": "Huge green accept button vs tiny grey decline link", "caught_by": "vision (phase 2)" },
+    { "id": "P8", "pattern": "drip_pricing", "page": "review", "what": "Platform fee ₹19 + handling fee ₹29 appear only on the review page", "caught_by": "rule" },
+    { "id": "P9", "pattern": "nagging", "page": "every page", "what": "'Get 10% off' newsletter popup comes back on every page", "caught_by": "rule" }
+  ]
+}

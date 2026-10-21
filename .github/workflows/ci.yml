@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build
+      - name: Detector tests
+        run: pnpm --filter @jhol/core test
+      - name: Pipeline e2e (fake TinyFish, real Redis)
+        run: pnpm --filter @jhol/api test:e2e
+        env:
+          TEST_REDIS_URL: redis://localhost:6379/15

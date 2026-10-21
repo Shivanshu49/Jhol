@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chalak Mart</title>
+<!--
+  Chalak Mart — Jhol's fictional test store (benchmark ground truth).
+  Every dark pattern here is planted on purpose and listed in ground-truth.json.
+  Deploy it anywhere public (e.g. your Next.js app's /public/lab/) and point the agent at it.
+-->
+<style>
+  :root { --bg:#fff7ed; --ink:#1c1917; --muted:#78716c; --brand:#ea580c; --ok:#16a34a; --line:#e7e5e4; --red:#dc2626; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--brand); color:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; }
+  header a { color:#fff; text-decoration:none; font-weight:700; }
+  main { max-width:720px; margin:0 auto; padding:16px; }
+  h1 { font-size:24px; margin:8px 0 12px; }
+  .banner { background:#fee2e2; color:var(--red); font-weight:700; text-align:center; padding:8px; border-radius:10px; margin-bottom:12px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px; }
+  .emoji { font-size:56px; text-align:center; }
+  .price { font-size:24px; font-weight:800; margin:6px 0; }
+  .muted { color:var(--muted); }
+  .urgent { color:var(--red); font-weight:700; margin:6px 0; }
+  .btn { display:inline-block; background:var(--brand); color:#fff; border:0; border-radius:10px; padding:12px 18px; font-size:16px; font-weight:700; cursor:pointer; text-decoration:none; }
+  .btn.green { background:var(--ok); width:100%; padding:14px; font-size:18px; }
+  .btn[disabled] { opacity:.45; cursor:not-allowed; }
+  .tiny-link { background:none; border:0; color:#b8b2ad; font-size:11px; text-decoration:underline; cursor:pointer; margin-top:10px; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--line); }
+  .row.total { font-weight:800; font-size:18px; border-bottom:0; }
+  .chk { display:flex; gap:10px; align-items:flex-start; padding:8px 0; }
+  .fine { display:block; font-size:10px; color:#b8b2ad; }
+  label.field { display:block; font-weight:600; margin-top:8px; }
+  input[type=text], input[type=email] { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; margin:4px 0 8px; font-size:15px; }
+  .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal { background:#fff; border-radius:14px; padding:22px; max-width:380px; width:100%; text-align:center; }
+  footer { text-align:center; font-size:12px; color:var(--muted); padding:24px 16px 40px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="#/">🛍️ Chalak Mart</a>
+  <a href="#/cart" id="cart-link">Cart (0)</a>
+</header>
+<main id="app"></main>
+<div id="modal-root"></div>
+<footer>Chalak Mart is a fictional test store used to benchmark Jhol. It is deliberately full of dark patterns. Not a real shop; nothing here can be bought.</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const PRODUCTS = [
+    { id: "tee", name: "Cotton Crew Tee", price: 499, emoji: "👕", blurb: "100% cotton, regular fit" },
+    { id: "tote", name: "Canvas Tote Bag", price: 549, emoji: "👜", blurb: "Fits a laptop and lunch" },
+    { id: "bottle", name: "Steel Water Bottle", price: 649, emoji: "🧴", blurb: "1 litre, keeps water cold for 12h" },
+  ];
+  const DONATION = { label: "Donation to Green India Fund", amount: 10 }; // P3: auto-added to every cart
+  const PROTECTION = { label: "Order Protection", amount: 49 };           // P4: pre-selected
+  const TRIAL = { label: "ChalakPlus 7-day free trial", amount: 0 };      // P5: pre-ticked, renews at ₹199/month
+  const INSURANCE = { label: "Damage Shield", amount: 39 };               // P6 + P7: the upsell modal
+  const LATE_FEES = [                                                     // P8: only shown on the review page
+    { label: "Platform fee", amount: 19 },
+    { label: "Handling fee", amount: 29 },
+  ];
+
+  const LOADED_AT = Date.now();                       // P1: the countdown restarts at 04:59 on every visit
+  const DEAL_SECONDS = 299;
+  const STOCK = 1 + Math.floor(Math.random() * 5);    // P2: "only N left" is random per visit
+  const VIEWERS = 9 + Math.floor(Math.random() * 30);
+
+  const KEY = "chalak-mart";
+  const fresh = () => ({ cart: [], donation: true, protection: true, trial: true, upsellDone: false, insurance: false, customer: null });
+  let state;
+  try { state = JSON.parse(sessionStorage.getItem(KEY)) || fresh(); } catch (e) { state = fresh(); }
+  const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage blocked: keep in memory */ } };
+
+  const $app = document.getElementById("app");
+  const $modal = document.getElementById("modal-root");
+  const rupees = (n) => "₹" + n.toLocaleString("en-IN");
+  const esc = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  const find = (id) => PRODUCTS.find((p) => p.id === id);
+  const items = () => state.cart.map((c) => Object.assign({}, find(c.id), { qty: c.qty })).filter((i) => i.id);
+  const itemsTotal = () => items().reduce((s, i) => s + i.price * i.qty, 0);
+  const extras = () => {
+    const x = [];
+    if (state.cart.length && state.donation) x.push(DONATION);
+    if (state.cart.length && state.protection) x.push(PROTECTION);
+    if (state.insurance) x.push(INSURANCE);
+    return x;
+  };
+  const cartTotal = () => itemsTotal() + extras().reduce((s, e) => s + e.amount, 0);
+  const reviewTotal = () => cartTotal() + LATE_FEES.reduce((s, f) => s + f.amount, 0);
+  const row = (label, value, cls) => `<div class="row ${cls || ""}"><span>${label}</span><span>${value}</span></div>`;
+
+  // ---------- pages ----------
+  function home() {
+    return `
+      <div class="banner">🔥 Festive Sale is LIVE: prices drop for the next few minutes only!</div>
+      <h1>Today's deals</h1>
+      <div class="grid">
+        ${PRODUCTS.map((p) => `
+          <div class="card">
+            <div class="emoji">${p.emoji}</div>
+            <strong>${p.name}</strong>
+            <div class="price">${rupees(p.price)}</div>
+            <div class="muted">${p.blurb}</div><br>
+            <a class="btn" href="#/p/${p.id}">View</a>
+          </div>`).join("")}
+      </div>`;
+  }
+
+  function productPage(id) {
+    const p = find(id);
+    if (!p) return home();
+    return `
+      <a href="#/">← All products</a>
+      <div class="card">
+        <div class="emoji">${p.emoji}</div>
+        <h1>${p.name}</h1>
+        <div class="price">${rupees(p.price)}</div>
+        <div class="muted">${p.blurb}</div>
+        <p class="urgent">⚡ Deal ends in <span id="deal-timer">${timerText()}</span></p>
+        <p class="urgent">🔥 Only ${STOCK} left in stock!</p>
+        <p class="muted">👀 ${VIEWERS} people are viewing this right now</p>
+        <button class="btn" data-action="add" data-id="${p.id}">Add to cart</button>
+      </div>`;
+  }
+
+  function cartPage() {
+    if (!state.cart.length) return `<h1>Your cart</h1><div class="card">Your cart is empty. <a href="#/">Shop deals</a></div>`;
+    return `
+      <h1>Your cart</h1>
+      <div class="card">
+        ${items().map((i) => row(`${i.name} × ${i.qty}`, rupees(i.price * i.qty))).join("")}
+        ${state.donation ? row(`${DONATION.label} <button class="tiny-link" data-action="remove-donation">remove</button>`, rupees(DONATION.amount)) : ""}
+        ${state.insurance ? row(INSURANCE.label, rupees(INSURANCE.amount)) : ""}
+        <label class="chk"><input type="checkbox" id="opt-protection" ${state.protection ? "checked" : ""}>
+          <span>${PROTECTION.label} (${rupees(PROTECTION.amount)}): covers loss in transit</span></label>
+        <label class="chk"><input type="checkbox" id="opt-trial" ${state.trial ? "checked" : ""}>
+          <span>Start ${TRIAL.label}: ₹0 today
+          <span class="fine">Renews at ₹199/month after 7 days unless cancelled.</span></span></label>
+        ${row("Subtotal", rupees(cartTotal()), "total")}
+        <button class="btn" data-action="checkout">Proceed to checkout</button>
+      </div>`;
+  }
+
+  function checkoutPage() {
+    if (!state.cart.length) return cartPage();
+    const c = state.customer || {};
+    return `
+      <h1>Delivery details</h1>
+      <form class="card" id="details">
+        <label class="field">Full name<input type="text" name="name" required value="${esc(c.name || "")}"></label>
+        <label class="field">Email<input type="email" name="email" required value="${esc(c.email || "")}"></label>
+        <label class="field">Pincode<input type="text" name="pincode" required inputmode="numeric" value="${esc(c.pincode || "")}"></label>
+        <button class="btn" type="submit">Continue to review</button>
+      </form>`;
+  }
+
+  function reviewPage() {
+    if (!state.cart.length) return cartPage();
+    return `
+      <h1>Review your order</h1>
+      <div class="card">
+        ${items().map((i) => row(`${i.name} × ${i.qty}`, rupees(i.price * i.qty))).join("")}
+        ${extras().map((e) => row(e.label, rupees(e.amount))).join("")}
+        ${state.trial ? row(TRIAL.label, rupees(TRIAL.amount)) : ""}
+        ${LATE_FEES.map((f) => row(f.label, rupees(f.amount))).join("")}
+        ${row("Delivery", "FREE")}
+        ${row("Total payable", rupees(reviewTotal()), "total")}
+        <button class="btn" data-action="to-pay">Continue to payment</button>
+      </div>`;
+  }
+
+  function payPage() {
+    if (!state.cart.length) return cartPage();
+    return `
+      <h1>Payment</h1>
+      <div class="card">
+        ${row("Amount payable", rupees(reviewTotal()), "total")}
+        <p>Choose a payment method</p>
+        <button class="btn" disabled>UPI</button>
+        <button class="btn" disabled>Card</button>
+        <button class="btn" disabled>Cash on delivery</button>
+        <p class="muted">Demo store: payments are switched off. Nothing can be bought here.</p>
+      </div>`;
+  }
+
+  // ---------- modals ----------
+  function showUpsell() { // P6 confirm shaming + P7 interface interference
+    $modal.innerHTML = `
+      <div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Protect your order">
+        <div class="emoji">🛡️</div>
+        <h2>Wait! Protect your order?</h2>
+        <p>Add ${INSURANCE.label} for just ${rupees(INSURANCE.amount)} and get a free replacement if anything arrives broken.</p>
+        <button class="btn green" data-action="upsell-yes">Yes, protect my order</button>
+        <div><button class="tiny-link" data-action="upsell-no">No thanks, I don't mind if my order arrives broken</button></div>
+      </div></div>`;
+  }
+
+  let nagTimer = null;
+  function scheduleNag(route) { // P9 nagging: same popup on every page
+    clearTimeout(nagTimer);
+    if (route.startsWith("#/pay")) return;
+    nagTimer = setTimeout(() => {
+      if ($modal.innerHTML.trim()) return;
+      $modal.innerHTML = `
+        <div class="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Join Chalak Club">
+          <div class="emoji">🎁</div>
+          <h2>Get 10% off your first order!</h2>
+          <p>Join the Chalak Club for secret deals in your inbox.</p>
+          <button class="btn" data-action="nag-close">Join now</button>
+          <div><button class="tiny-link" data-action="nag-close">Not now</button></div>
+        </div></div>`;
+    }, 700);
+  }
+  const closeModal = () => { $modal.innerHTML = ""; };
+
+  // ---------- timer ----------
+  function timerText() {
+    const elapsed = Math.floor((Date.now() - LOADED_AT) / 1000);
+    const left = DEAL_SECONDS - (elapsed % (DEAL_SECONDS + 1));
+    return String(Math.floor(left / 60)).padStart(2, "0") + ":" + String(left % 60).padStart(2, "0");
+  }
+  setInterval(() => {
+    const el = document.getElementById("deal-timer");
+    if (el) el.textContent = timerText();
+  }, 1000);
+
+  // ---------- router ----------
+  function render() {
+    const route = location.hash || "#/";
+    let html;
+    if (route.startsWith("#/p/")) html = productPage(route.slice(4));
+    else if (route === "#/cart") html = cartPage();
+    else if (route === "#/checkout") html = checkoutPage();
+    else if (route === "#/review") html = reviewPage();
+    else if (route === "#/pay") html = payPage();
+    else html = home();
+    $app.innerHTML = html;
+    document.getElementById("cart-link").textContent = `Cart (${state.cart.reduce((s, c) => s + c.qty, 0)})`;
+    window.scrollTo(0, 0);
+    scheduleNag(route);
+  }
+  const go = (hash) => { if (location.hash === hash) render(); else location.hash = hash; };
+
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-action]");
+    if (!el) return;
+    const a = el.dataset.action;
+    if (a === "add") { state.cart = [{ id: el.dataset.id, qty: 1 }]; state.upsellDone = false; state.insurance = false; save(); go("#/cart"); }
+    else if (a === "remove-donation") { state.donation = false; save(); render(); }
+    else if (a === "checkout") { if (state.upsellDone) go("#/checkout"); else { clearTimeout(nagTimer); showUpsell(); } }
+    else if (a === "upsell-yes" || a === "upsell-no") { state.insurance = a === "upsell-yes"; state.upsellDone = true; save(); closeModal(); go("#/checkout"); }
+    else if (a === "nag-close") closeModal();
+    else if (a === "to-pay") go("#/pay");
+  });
+  document.addEventListener("change", (e) => {
+    if (e.target.id === "opt-protection") { state.protection = e.target.checked; save(); render(); }
+    if (e.target.id === "opt-trial") { state.trial = e.target.checked; save(); render(); }
+  });
+  document.addEventListener("submit", (e) => {
+    if (e.target.id !== "details") return;
+    e.preventDefault();
+    const f = new FormData(e.target);
+    state.customer = { name: String(f.get("name") || ""), email: String(f.get("email") || ""), pincode: String(f.get("pincode") || "") };
+    save();
+    go("#/review");
+  });
+  window.addEventListener("hashchange", render);
+
+  // for automated checks only
+  window.__chalak = { totals: () => ({ items: itemsTotal(), cart: cartTotal(), review: reviewTotal() }), stock: STOCK };
+  render();
+})();
+</script>
+</body>
+</html>
