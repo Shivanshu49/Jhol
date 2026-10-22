@@ -2,8 +2,6 @@
 
 **Jhol is an AI agent that shops a website like a real customer, stops before payment, and reports every dark pattern it ran into (hidden fees, sneaked add-ons, fake timers, pre-ticked subscriptions), mapped to CCPA's 13 dark patterns, with the exact text as proof.**
 
-> 🎥 Demo video: _add link_ · 📣 Post: _add link_ · 🌐 Live app: _add link_
-
 ---
 
 ## The problem
