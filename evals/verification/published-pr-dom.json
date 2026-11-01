@@ -1,0 +1,119 @@
+{
+  "publishedHead": "e55f4a9b08197b44b3556bb950ac7297f30ed567",
+  "source": "Exact git blob served by a temporary local HTTP server; deterministic DOM check, not an agent audit",
+  "dialogCount": 1,
+  "observed": [
+    {
+      "page": "home",
+      "dialogOpen": true,
+      "snapshotDialogs": [],
+      "choices": [
+        "Join now",
+        "Not now"
+      ]
+    },
+    {
+      "page": "product",
+      "dialogOpen": false,
+      "urgency": []
+    },
+    {
+      "page": "cart",
+      "protection": false,
+      "trial": false,
+      "totals": {
+        "items": 499,
+        "cart": 499,
+        "review": 499
+      },
+      "text": "Your cart\nCotton Crew Tee × 1\n₹499\nOrder Protection (₹49): covers loss in transit\nStart ChalakPlus 7-day free trial: ₹0 today\nRenews at ₹199/month after 7 days unless cancelled.\nSubtotal\n₹499\nProceed to checkout",
+      "snapshot": {
+        "url": "http://127.0.0.1:37157/index.html#/cart",
+        "title": "Chalak Mart",
+        "headings": [
+          "Your cart"
+        ],
+        "elements": [
+          {
+            "id": "e1",
+            "tag": "a",
+            "type": "",
+            "name": "",
+            "text": "🛍️ Chalak Mart",
+            "label": "",
+            "checked": null,
+            "disabled": false,
+            "covered": false
+          },
+          {
+            "id": "e2",
+            "tag": "a",
+            "type": "",
+            "name": "",
+            "text": "Cart (1)",
+            "label": "",
+            "checked": null,
+            "disabled": false,
+            "covered": false
+          },
+          {
+            "id": "e3",
+            "tag": "input",
+            "type": "checkbox",
+            "name": "",
+            "text": "Order Protection (₹49): covers loss in transit",
+            "label": "",
+            "checked": false,
+            "disabled": false,
+            "covered": false
+          },
+          {
+            "id": "e4",
+            "tag": "input",
+            "type": "checkbox",
+            "name": "",
+            "text": "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.",
+            "label": "",
+            "checked": false,
+            "disabled": false,
+            "covered": false
+          },
+          {
+            "id": "e5",
+            "tag": "button",
+            "type": "",
+            "name": "",
+            "text": "Proceed to checkout",
+            "label": "",
+            "checked": null,
+            "disabled": false,
+            "covered": false
+          }
+        ],
+        "priceLines": [
+          "Cotton Crew Tee × 1 ₹499",
+          "Order Protection (₹49): covers loss in transit",
+          "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.",
+          "Subtotal ₹499"
+        ],
+        "urgencyLines": [],
+        "dialogs": [],
+        "checked": []
+      }
+    },
+    {
+      "page": "review",
+      "text": "Review your order\nCotton Crew Tee × 1\n₹499\nDelivery\nFREE\nTotal payable\n₹499\nContinue to payment",
+      "totals": {
+        "items": 499,
+        "cart": 499,
+        "review": 499
+      }
+    },
+    {
+      "page": "payment",
+      "text": "Payment\nAmount payable\n₹499\n\nChoose a payment method\n\nUPI Card Cash on delivery\n\nDemo store: payments are switched off. Nothing can be bought here.",
+      "dialogOpen": false
+    }
+  ]
+}

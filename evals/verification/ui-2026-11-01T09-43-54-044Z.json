@@ -1,0 +1,10 @@
+{
+  "target": "http://localhost:5051/index.html",
+  "twice": false,
+  "triggerFix": false,
+  "createdThroughUI": true,
+  "resumedAudit": null,
+  "stubbed": false,
+  "publishing": false,
+  "auditId": "89ba68e3-bb3d-4c56-814d-da706f5a472c"
+}

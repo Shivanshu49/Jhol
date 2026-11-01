@@ -177,3 +177,49 @@ test("one item labelled differently on cart and review is counted once", () => {
   for (const f of runRuleDetectors({ result, startedAt: new Date() }).findings) count[f.pattern] = (count[f.pattern] ?? 0) + 1;
   assert.deepEqual(count, { drip_pricing: 2, basket_sneaking: 2, subscription_trap: 1 });
 });
+
+test("an add-to-cart click can identify its product when the model omitted product_added", () => {
+  const { addedItemForAction } = require("../dist/index.js");
+  const current = snap([el({ tag: "button", text: "Add to cart" })]);
+  const data = { line_items: [{ label: "Cotton Crew Tee", amount: 499 }] };
+  assert.equal(addedItemForAction(current, data, click, null), "Cotton Crew Tee");
+  assert.equal(addedItemForAction(current, data, fill, null), null);
+  assert.equal(addedItemForAction(snap([el({ tag: "button", text: "Continue to review" })]), data, click, null), null);
+  assert.equal(addedItemForAction(current, { line_items: [...data.line_items, { label: "Tote", amount: 549 }] }, click, null), null);
+});
+
+test("unchecked offers are not order rows; actual charges, checked extras and native dialogs remain evidence", async () => {
+  const { chromium } = require("playwright");
+  const { takeSnapshot, observedPageData } = require("../dist/index.js");
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage();
+    await page.setContent(`<main><h1>Cart</h1><div>Cotton Crew Tee ₹499</div>
+      <label><input type="checkbox" id="protection">Order Protection (₹49): covers loss in transit</label>
+      <label><input type="checkbox" id="trial">Start ChalakPlus 7-day free trial: ₹0 today. Renews at ₹199/month after 7 days.</label>
+      <label><input type="checkbox" checked>Damage Shield ₹39</label><div id="charged"></div></main>
+      <dialog><h2>Optional offer</h2><button>Not now</button></dialog>`);
+    await page.evaluate(() => document.querySelector("dialog").showModal());
+    const data = { total_shown: 538, line_items: [{ label: "Cotton Crew Tee", amount: 499 }, { label: "Order Protection", amount: 49 },
+      { label: "ChalakPlus 7-day free trial", amount: 0 }, { label: "Damage Shield", amount: 39 }],
+      popups: ["Invented popup copied from a previous page"], urgency_texts: [], choice_texts: [] };
+    let current = await takeSnapshot(page);
+    let got = observedPageData(data, current);
+    assert.deepEqual(got.line_items.map((li) => li.label), ["Cotton Crew Tee", "Damage Shield"]);
+    assert.deepEqual(got.popups, ["Optional offer Not now"]);
+    assert.equal(current.checked.length, 1);
+    await page.evaluate(() => { document.querySelector("dialog").close(); document.querySelector("#charged").textContent = "Order Protection ₹49"; });
+    got = observedPageData(data, await takeSnapshot(page));
+    assert.ok(got.line_items.some((li) => li.label === "Order Protection"), "an independent charge row must not be hidden by an unchecked offer");
+    assert.deepEqual(got.popups, []);
+    await page.evaluate(() => { document.querySelector("#trial").checked = true; });
+    current = await takeSnapshot(page);
+    got = observedPageData(data, current);
+    assert.ok(got.line_items.some((li) => li.label.includes("trial")));
+    assert.ok(current.checked.some((label) => label.includes("trial")));
+    await page.setContent('<main><div>Cotton Tee ₹499</div><label><input type="checkbox">Order Protection ₹49</label><div>Total ₹499</div></main>');
+    current = await takeSnapshot(page);
+    got = observedPageData({ ...data, line_items: [{ label: "Order Protection", amount: 49 }] }, current);
+    assert.deepEqual(got.line_items, [], "compact ancestors must not turn an unchecked offer into an order row");
+  } finally { await browser.close(); }
+});

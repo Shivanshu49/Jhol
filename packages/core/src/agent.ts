@@ -76,6 +76,7 @@ RULES:
 - page: a short name (home, product, cart, checkout, review, payment). Keep the same name while you stay on a page; a popup does not change it.
 - total_shown: the product's price on a product page, the order total on cart/checkout/review/payment pages, null on listing pages.
 - line_items: only the order: the product on its own product page, and the rows of the cart/checkout/review/payment pages. Leave it EMPTY on home and listing pages.
+- Unchecked optional offers are not in the order. Exclude them from line_items; their wording may go in choice_texts. Never copy data or popups from past pages.
 - An element marked COVERED is behind a popup or overlay and can't be clicked. Deal with the popup first (decline/close it).`;
 
 type Schema = {
@@ -272,6 +273,29 @@ export function matchAdded(name: string, steps: JourneyStep[]): string {
   return best;
 }
 
+/** Ground optional items and popup evidence in this snapshot, not model memory. */
+export function observedPageData(data: PageData, snap: Snapshot): PageData {
+  const name = (s: string) => words(s.split(/[(:]/, 1)[0]
+    .replace(/(?:₹|\brs\.?|\binr)\s*-?[\d,]+(?:\.\d+)?/gi, " ")
+    .replace(/^\s*(?:start|add|optional)\s+/i, ""));
+  const matches = (a: string, b: string) => a.trim().length >= 4 && b.trim().length >= 4 && (a.includes(b) || b.includes(a));
+  const offers = snap.elements.filter((e) => e.checked === false).map((e) => name(e.label || e.text));
+  const rows = snap.priceLines.map(name);
+  return { ...data, popups: snap.dialogs, line_items: data.line_items.filter((li) => {
+    const key = name(li.label);
+    return !offers.some((offer) => matches(key, offer)) || rows.some((row) => matches(key, row));
+  }) };
+}
+
+/** Infer an omitted model product_added only for an explicit add-to-cart action on one product. */
+export function addedItemForAction(snap: Snapshot, data: PageData, action: AgentAction, modelName: string | null): string | null {
+  if (action.type !== "click") return null;
+  if (modelName?.trim()) return modelName;
+  const target = snap.elements.find((e) => e.id === action.target);
+  const products = data.line_items.filter((li) => (li.amount ?? 0) > 0);
+  return target && /\badd\b.*\b(?:cart|bag|basket)\b/i.test(target.text) && products.length === 1 ? products[0].label : null;
+}
+
 /** Hard safety rules, enforced in code whatever the model says. Returns why the action is refused, or null. */
 export function refusal(el: SnapElement, a: AgentAction): string | null {
   if (a.type === "click" && SUBMIT_ORDER_RE.test(`${el.text} ${el.label} ${el.name}`)) {
@@ -366,7 +390,7 @@ export async function runJourney(url: string, opts: RunJourneyOptions = {}): Pro
 
       // Record the page. preselected comes from this (first) snapshot of a new page, never from the model.
       const name = norm(d.page) || "page";
-      const pd = d.page_data;
+      const pd = observedPageData(d.page_data, snap);
       const last = steps.at(-1);
       if (last && last.page === name) {
         last.total_shown = pd.total_shown ?? last.total_shown;
@@ -378,7 +402,6 @@ export async function runJourney(url: string, opts: RunJourneyOptions = {}): Pro
       } else {
         steps.push({ page: name, ...pd, preselected: snap.checked.map(preselectedItem) });
       }
-      if (d.product_added) added.push(d.product_added);
 
       const atPayment = paymentVisible(snap);
       const a: AgentAction = atPayment
@@ -395,6 +418,8 @@ export async function runJourney(url: string, opts: RunJourneyOptions = {}): Pro
       if (!atPayment && a.type !== "stop") {
         try {
           await act(page, snap, a);
+          const product = addedItemForAction(snap, pd, a, d.product_added);
+          if (product) added.push(product);
           await page.waitForLoadState("domcontentloaded").catch(() => {});
           await page.waitForTimeout(SETTLE_MS);
         } catch (e) {

@@ -101,8 +101,10 @@ export async function takeSnapshot(page: Page): Promise<Snapshot> {
       const t = clean(el.innerText, 200);
       if (!t || t.length > 120 || !(PRICE.test(t) || URGENT.test(t)) || !visible(el)) continue;
       while (
+        el.tagName !== "LABEL" &&
         el.parentElement &&
         el.parentElement !== document.body &&
+        !el.parentElement.querySelector("input[type=checkbox], input[type=radio], [role=checkbox], [role=radio], [role=switch]") &&
         (el.parentElement.textContent?.length ?? 0) < 2000 && // cheap bail before measuring innerText
         clean(el.parentElement.innerText, 200).length <= 120
       ) {
@@ -111,9 +113,16 @@ export async function takeSnapshot(page: Page): Promise<Snapshot> {
       lines.add(el);
     }
     const texts = [...new Set(Array.from(lines, (el) => clean((el as HTMLElement).innerText, 120)))];
+    // Offers remain readable as unchecked elements, but are not order-price rows.
+    const uncheckedLabels = elements.filter((e) => e.checked === false).flatMap((e) => {
+      const input = document.querySelector(`[data-jhol-id="${e.id}"]`) as HTMLInputElement;
+      return Array.from(input.labels ?? []).concat(input.closest("label") ? [input.closest("label")!] : []);
+    });
+    const orderPrices = [...new Set(Array.from(lines).filter((el) => !uncheckedLabels.some((label) => label.contains(el)))
+      .map((el) => clean((el as HTMLElement).innerText, 120)))];
 
     const dialogEls = new Set<Element>(
-      Array.from(document.querySelectorAll("[role=dialog], [role=alertdialog], [aria-modal=true]")).filter(visible),
+      Array.from(document.querySelectorAll("dialog[open], [role=dialog], [role=alertdialog], [aria-modal=true]")).filter(visible),
     );
     for (let el = document.elementFromPoint(innerWidth / 2, innerHeight / 2); el; el = el.parentElement) {
       const cs = getComputedStyle(el);
@@ -135,7 +144,7 @@ export async function takeSnapshot(page: Page): Promise<Snapshot> {
       title: clean(document.title, 120),
       headings: Array.from(document.querySelectorAll("h1, h2, h3")).filter(visible).map((h) => clean((h as HTMLElement).innerText, 120)).filter(Boolean).slice(0, 10),
       elements,
-      priceLines: texts.filter((t) => PRICE.test(t)).slice(0, 40),
+      priceLines: orderPrices.filter((t) => PRICE.test(t)).slice(0, 40),
       urgencyLines: texts.filter((t) => URGENT.test(t)).slice(0, 40),
       dialogs: [...new Set(Array.from(dialogEls, (el) => clean((el as HTMLElement).innerText, 600)))].filter(Boolean),
       checked,

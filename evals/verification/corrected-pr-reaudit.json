@@ -1,0 +1,150 @@
+{
+  "publishedHead": "e55f4a9b08197b44b3556bb950ac7297f30ed567",
+  "storeChanged": false,
+  "codexRerun": false,
+  "originalBeforeId": "a69ba9ac-5a83-49a0-8b8e-4db4ba5c9306",
+  "previousReauditId": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+  "audit": {
+    "id": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+    "url": "http://localhost:5051/index.html",
+    "journey": "checkout",
+    "sessions": 1,
+    "options": {},
+    "status": "done",
+    "error": null,
+    "price_shown": 499,
+    "price_final": 499,
+    "score": 100,
+    "report_hash": "32bb522ff00bdd441c68cf2a6cda8804ec91e898cbb0748a5e346f5ada54874d",
+    "created_at": "2026-11-01T09:44:03.169562+00:00",
+    "finished_at": "2026-11-01T09:45:01.6+00:00",
+    "precedents": {},
+    "fix_status": null,
+    "fix_pr_url": null,
+    "fix_branch": null,
+    "fixed_audit_id": null,
+    "fix_error": null,
+    "fix_message": null,
+    "fix_diff_summary": null
+  },
+  "findings": [],
+  "runs": [
+    {
+      "id": "03929a3c-8649-4038-8657-36eb7b48a024",
+      "audit_id": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+      "session": "A",
+      "tinyfish_run_id": null,
+      "status": "COMPLETED",
+      "streaming_url": null,
+      "video_url": null,
+      "started_at": "2026-11-01T09:44:03.693+00:00",
+      "num_steps": 13,
+      "result": {
+        "steps": [
+          {
+            "page": "home",
+            "popups": [
+              "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox. Join now Not now"
+            ],
+            "line_items": [],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [
+              "Join now",
+              "Not now"
+            ],
+            "urgency_texts": [
+              "Get 10% off your first order!"
+            ]
+          },
+          {
+            "page": "product",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "cart",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Subtotal",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "checkout",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "review",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Delivery",
+                "amount": 0
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "payment",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Amount payable",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          }
+        ],
+        "stop_reason": "Reached payment step",
+        "items_added_by_agent": [
+          "Cotton Crew Tee"
+        ],
+        "reached_payment_page": true
+      },
+      "error": null,
+      "created_at": "2026-11-01T09:44:04.065667+00:00"
+    }
+  ],
+  "correctedReceiptsShown": true
+}

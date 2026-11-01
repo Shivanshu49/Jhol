@@ -1,0 +1,176 @@
+{
+  "target": "http://localhost:5051/index.html",
+  "twice": false,
+  "triggerFix": false,
+  "createdThroughUI": false,
+  "resumedAudit": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+  "stubbed": false,
+  "publishing": false,
+  "auditId": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+  "before": {
+    "audit": {
+      "id": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+      "url": "http://localhost:5051/index.html",
+      "journey": "checkout",
+      "sessions": 1,
+      "options": {},
+      "status": "done",
+      "error": null,
+      "price_shown": 499,
+      "price_final": 499,
+      "score": 100,
+      "report_hash": "32bb522ff00bdd441c68cf2a6cda8804ec91e898cbb0748a5e346f5ada54874d",
+      "created_at": "2026-11-01T09:44:03.169562+00:00",
+      "finished_at": "2026-11-01T09:45:01.6+00:00",
+      "fix_status": null,
+      "fix_pr_url": null,
+      "fix_branch": null,
+      "fixed_audit_id": null,
+      "fix_error": null,
+      "fix_message": null,
+      "fix_diff_summary": null
+    },
+    "runs": [
+      {
+        "id": "03929a3c-8649-4038-8657-36eb7b48a024",
+        "audit_id": "89ba68e3-bb3d-4c56-814d-da706f5a472c",
+        "session": "A",
+        "tinyfish_run_id": null,
+        "status": "COMPLETED",
+        "streaming_url": null,
+        "video_url": null,
+        "started_at": "2026-11-01T09:44:03.693+00:00",
+        "num_steps": 13,
+        "error": null,
+        "created_at": "2026-11-01T09:44:04.065667+00:00",
+        "reached_payment_page": true,
+        "stop_reason": "Reached payment step",
+        "pages": [
+          "home",
+          "product",
+          "cart",
+          "checkout",
+          "review",
+          "payment"
+        ],
+        "steps": [
+          {
+            "idx": 1,
+            "page": "home",
+            "action": "click",
+            "reason": "Decline the popup for 10% off offer · Action failed: There is no element \"[e7]\" on the page now (it changed; a popup you closed is gone). Use only ids from the current snapshot.",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/1.jpg"
+          },
+          {
+            "idx": 2,
+            "page": "home",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup for 10% off offer",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/2.jpg"
+          },
+          {
+            "idx": 3,
+            "page": "home",
+            "action": "click",
+            "reason": "View the cheapest product details (Cotton Crew Tee, ₹499) to add one unit to cart · Action failed: There is no element \"[e3]\" on the page now (it changed; a popup you closed is gone). Use only ids from the current snapshot.",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/3.jpg"
+          },
+          {
+            "idx": 4,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View the cheapest product details (Cotton Crew Tee, ₹499) to add one unit to cart",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/4.jpg"
+          },
+          {
+            "idx": 5,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add one unit of the cheapest product (Cotton Crew Tee) to the cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/5.jpg"
+          },
+          {
+            "idx": 6,
+            "page": "cart",
+            "action": "click \"Proceed to checkout\"",
+            "reason": "Proceed to checkout from cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/6.jpg"
+          },
+          {
+            "idx": 7,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "Fill guest checkout name · Action failed: There is no element \"name\" on the page now (it changed; a popup you closed is gone). Use only ids from the current snapshot.",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/7.jpg"
+          },
+          {
+            "idx": 8,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "Fill guest checkout name",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/8.jpg"
+          },
+          {
+            "idx": 9,
+            "page": "checkout",
+            "action": "fill = \"test@example.com\"",
+            "reason": "Fill email for guest checkout",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/9.jpg"
+          },
+          {
+            "idx": 10,
+            "page": "checkout",
+            "action": "fill = \"110001\"",
+            "reason": "Fill pincode for guest checkout",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/10.jpg"
+          },
+          {
+            "idx": 11,
+            "page": "checkout",
+            "action": "click \"Continue to review\"",
+            "reason": "Continue to review after filling delivery details",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/11.jpg"
+          },
+          {
+            "idx": 12,
+            "page": "review",
+            "action": "click \"Continue to payment\"",
+            "reason": "Proceed to the payment step",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/12.jpg"
+          },
+          {
+            "idx": 13,
+            "page": "payment",
+            "action": "stop",
+            "reason": "Payment options visible; never submit an order or payment.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/89ba68e3-bb3d-4c56-814d-da706f5a472c/A/13.jpg"
+          }
+        ]
+      }
+    ],
+    "findings": [],
+    "precedents": {},
+    "fix_available": false,
+    "fix_after": null
+  },
+  "beforeEvidence": {
+    "rows": 13,
+    "screenshots": 13,
+    "jpegBytes": 336994
+  },
+  "evidenceShownAfterReload": true,
+  "browserErrors": []
+}
