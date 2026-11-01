@@ -10,8 +10,6 @@ export async function createAudit(_prev: FormState, formData: FormData): Promise
   const body = {
     url: String(formData.get("url") ?? "").trim(),
     sessions: formData.get("urgencyTest") === "on" ? 2 : 1,
-    indiaProxy: formData.get("indiaProxy") === "on",
-    stealth: formData.get("stealth") === "on",
     ...(pincode ? { pincode } : {}),
   };
 

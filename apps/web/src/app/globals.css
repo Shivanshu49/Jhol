@@ -1,16 +1,141 @@
 @import "tailwindcss";
 
+/* Self-hosted fonts (no Google Fonts call at runtime) */
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+@import "@fontsource/kalam/400.css";
+@import "@fontsource/kalam/700.css";
+
+/*
+  Jhol palette: a shop counter, a thermal receipt, an auditor's pens.
+  desk     #E6E9EC  cool grey counter top
+  receipt  #FFFFFF  thermal paper
+  ink      #1E2126  thermal print / body text
+  redpen   #D7261E  auditor's red pen: problems
+  bluepen  #1D3FBF  ballpoint blue: actions, "checked"
+*/
 @theme {
-  --color-ink: #17130e;
-  --color-paper: #faf7f2;
-  --color-brand: #d9480f;
-  --color-brand-soft: #fff1e8;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-desk: #e6e9ec;
+  --color-receipt: #ffffff;
+  --color-ink: #1e2126;
+  --color-redpen: #d7261e;
+  --color-bluepen: #1d3fbf;
+
+  /* kept for the dashboard/report pages */
+  --color-paper: #e6e9ec;
+  --color-brand: #d7261e;
+  --color-brand-soft: #fdecea;
+
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-hand: "Kalam", "Comic Sans MS", cursive;
 }
 
 html,
 body {
-  background: var(--color-paper);
+  overflow-x: clip;
+  background: var(--color-desk);
   color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-bluepen);
+  outline-offset: 3px;
+}
+
+/* Condensed display type for headlines */
+.display {
+  font-family: var(--font-sans);
+  font-stretch: 62%;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+/* Thermal receipt with torn zig-zag edges. The paper is a pseudo-element,
+   so pen notes and stamps can sit outside it without being clipped. */
+.receipt {
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-mono);
+}
+.receipt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-receipt);
+  --tear: 10px;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tear) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--tear) 51% repeat-x;
+}
+
+.leader {
+  flex: 1;
+  border-bottom: 2px dotted rgba(30, 33, 38, 0.25);
+  transform: translateY(-0.3em);
+  margin: 0 0.5em;
+}
+
+/* Red-pen circle around a receipt line: drawn once on load */
+.pen-ring {
+  position: absolute;
+  inset: -6px -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 12px);
+  overflow: visible;
+  pointer-events: none;
+}
+.pen-ring path {
+  fill: none;
+  stroke: var(--color-redpen);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 0.7s ease-out forwards;
+  animation-delay: var(--d, 0s);
+}
+.pen-note {
+  opacity: 0;
+  animation: appear 0.3s ease-out forwards;
+  animation-delay: var(--d, 0s);
+}
+.stamp {
+  opacity: 0;
+  transform: rotate(-9deg) scale(1.35);
+  animation: thump 0.25s ease-in forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes thump {
+  to {
+    opacity: 1;
+    transform: rotate(-9deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pen-ring path,
+  .pen-note,
+  .stamp {
+    animation: none;
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  .stamp {
+    transform: rotate(-9deg);
+  }
 }
