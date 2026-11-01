@@ -18,12 +18,19 @@
 @theme {
   --color-desk: #e6e9ec;
   --color-receipt: #ffffff;
-  --color-ink: #1e2126;
+  --color-ink: #28252b;
   --color-redpen: #d7261e;
   --color-bluepen: #1d3fbf;
 
-  /* kept for the dashboard/report pages */
-  --color-paper: #e6e9ec;
+  --color-primary: #c44a2f;
+  --color-primary-hover: #a93b26;
+  --color-secondary: #367b67;
+  --color-secondary-hover: #285f51;
+  --color-accent: #292532;
+  --color-paper: #f8f5ef;
+  --color-surface: color-mix(in srgb, var(--color-accent) 82%, var(--color-paper));
+  --color-surface-raised: color-mix(in srgb, var(--color-accent) 72%, var(--color-paper));
+
   --color-brand: #d7261e;
   --color-brand-soft: #fdecea;
 
@@ -35,13 +42,27 @@
 html,
 body {
   overflow-x: clip;
-  background: var(--color-desk);
-  color: var(--color-ink);
+  background: var(--color-accent);
+  color: var(--color-paper);
 }
 
 :focus-visible {
   outline: 3px solid var(--color-bluepen);
   outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-ink);
+}
+
+/* Faint drafting grid behind the hero. */
+.jhol-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--color-primary) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-secondary) 8%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 65% 70% at 50% 0%, black 35%, transparent 100%);
 }
 
 /* Condensed display type for headlines */
@@ -128,6 +149,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .pen-ring path,
   .pen-note,
   .stamp {

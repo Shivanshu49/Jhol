@@ -1,15 +1,9 @@
 import Link from "next/link";
+import { backend } from "@/lib/backend";
+import type { Audit } from "@/lib/types";
 import { AuditForm } from "./audit-form";
-
-type Line = { label: string; amount: string; note?: string };
-
-const BILL: Line[] = [
-  { label: "Cotton crew tee  x1", amount: "499.00" },
-  { label: "Green India donation", amount: "10.00", note: "never added this" },
-  { label: "Order protection", amount: "49.00", note: "came pre-ticked" },
-  { label: "Platform fee", amount: "19.00", note: "only shown at the last step" },
-  { label: "Handling fee", amount: "29.00", note: "this one too" },
-];
+import { HomeHero } from "./home-hero";
+import { RecentAudits } from "./recent-audits";
 
 const CATCHES = [
   ["Hidden fees", "Charges that first appear at the last step"],
@@ -20,34 +14,23 @@ const CATCHES = [
   ["Nagging popups", "The same offer on every page"],
 ];
 
-export default function Home() {
-  return (
-    <div>
-      {/* Hero: the bill, marked up */}
-      <section className="grid items-center gap-12 pb-20 pt-6 lg:grid-cols-[1fr_1.05fr] lg:gap-6">
-        <div className="min-w-0 max-w-xl">
-          <h1 className="display text-[clamp(2.9rem,8.5vw,6.8rem)]">
-            ₹499 on the product page. ₹606 at payment.
-          </h1>
-          <p className="mt-6 text-xl leading-relaxed text-ink/80">
-            Jhol shops your store like a real customer, marks every hidden charge and pre-ticked add-on with proof,
-            and has Codex fix the checkout.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-6">
-            <Link
-              href="#try"
-              className="rounded-md bg-bluepen px-6 py-3.5 text-lg font-semibold text-white hover:bg-bluepen/90"
-            >
-              Audit a store
-            </Link>
-            <Link href="#how" className="font-semibold underline decoration-2 underline-offset-4">
-              See how it works
-            </Link>
-          </div>
-        </div>
+export const dynamic = "force-dynamic";
 
-        <MarkedBill />
-      </section>
+async function recentAudits(): Promise<Audit[]> {
+  try {
+    const response = await backend("/audits");
+    return response.ok ? ((await response.json()) as Audit[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const audits = await recentAudits();
+
+  return (
+    <div className="space-y-16 pb-12 sm:space-y-24">
+      <HomeHero />
 
       {/* Problem, said plainly */}
       <section className="grid gap-8 border-t-2 border-ink py-16 lg:grid-cols-[1fr_1.4fr]">
@@ -137,7 +120,7 @@ export default function Home() {
       </section>
 
       {/* Try it */}
-      <section id="try" className="scroll-mt-8 border-t-2 border-ink pt-16">
+      <section id="audit" className="scroll-mt-24 border-t-2 border-ink pt-16">
         <h2 className="display text-5xl sm:text-6xl">Audit a store</h2>
         <p className="mt-3 max-w-xl text-lg text-ink/70">
           No store handy? Try Chalak Mart, our test shop with 9 tricks planted on purpose.{" "}
@@ -149,64 +132,8 @@ export default function Home() {
           <AuditForm />
         </div>
       </section>
-    </div>
-  );
-}
 
-function MarkedBill() {
-  return (
-    <div className="relative mx-auto w-full min-w-0 max-w-[420px] lg:mr-48">
-      <p className="pen-note font-hand absolute -top-9 left-2 text-xl text-redpen" style={{ ["--d" as string]: "0.2s" }}>
-        price on the product page: ₹499
-      </p>
-      <div className="receipt -rotate-1 px-7 pb-12 pt-10 text-[14px] leading-7">
-        <p className="text-center font-semibold tracking-wide">CHALAK MART</p>
-        <p className="text-center text-ink/60">Order CM-20481 · Guest checkout</p>
-        <p className="my-3 overflow-hidden whitespace-nowrap text-ink/40">{"-".repeat(60)}</p>
-
-        {BILL.map((l, i) => (
-          <div key={l.label} className="relative">
-            <div className="flex items-baseline">
-              <span className="truncate">{l.label}</span>
-              <span className="leader" />
-              <span className="relative tabular-nums">
-                {l.amount}
-                {l.note && (
-                  <svg className="pen-ring" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
-                    <path
-                      d="M8 22 C 6 8, 45 2, 80 6 C 98 9, 99 30, 70 35 C 40 39, 4 36, 6 20 C 7 14, 14 11, 22 9"
-                      style={{ ["--d" as string]: `${0.5 + i * 0.45}s` }}
-                    />
-                  </svg>
-                )}
-              </span>
-            </div>
-            {l.note && (
-              <span
-                className="pen-note font-hand block text-[17px] leading-5 text-redpen lg:absolute lg:left-full lg:top-0 lg:ml-9 lg:whitespace-nowrap"
-                style={{ ["--d" as string]: `${0.8 + i * 0.45}s` }}
-              >
-                {l.note}
-              </span>
-            )}
-          </div>
-        ))}
-
-        <p className="my-3 overflow-hidden whitespace-nowrap text-ink/40">{"-".repeat(60)}</p>
-        <div className="flex items-baseline text-lg font-semibold">
-          <span>TOTAL</span>
-          <span className="leader" />
-          <span className="tabular-nums">₹606.00</span>
-        </div>
-      </div>
-
-      <div
-        className="stamp absolute -bottom-6 right-2 border-[3px] border-double border-redpen px-3 py-1 text-center font-mono font-semibold text-redpen sm:-right-6"
-        style={{ ["--d" as string]: "2.9s" }}
-      >
-        <span className="block text-2xl leading-tight">+₹107</span>
-        <span className="block text-xs">4 tricks found</span>
-      </div>
+      <RecentAudits audits={audits} />
     </div>
   );
 }

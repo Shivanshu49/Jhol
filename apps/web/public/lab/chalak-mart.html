@@ -10,34 +10,56 @@
   Deploy it anywhere public (e.g. your Next.js app's /public/lab/) and point the agent at it.
 -->
 <style>
-  :root { --bg:#fff7ed; --ink:#1c1917; --muted:#78716c; --brand:#ea580c; --ok:#16a34a; --line:#e7e5e4; --red:#dc2626; }
+  :root {
+    --color-primary:#C44A2F;
+    --color-primary-hover:#A93B26;
+    --color-secondary:#367B67;
+    --color-secondary-hover:#285F51;
+    --color-accent:#292532;
+    --color-surface:color-mix(in srgb, var(--color-accent) 82%, var(--color-paper));
+    --color-surface-raised:color-mix(in srgb, var(--color-accent) 72%, var(--color-paper));
+    --color-ink:#28252B;
+    --color-paper:#F8F5EF;
+    --color-muted:color-mix(in srgb, var(--color-paper) 72%, var(--color-surface));
+    --color-line:color-mix(in srgb, var(--color-paper) 16%, transparent);
+    --color-footer:color-mix(in srgb, var(--color-paper) 60%, var(--color-accent));
+  }
   * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
-  header { background:var(--brand); color:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; }
-  header a { color:#fff; text-decoration:none; font-weight:700; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--color-accent); color:var(--color-paper); }
+  header { background:var(--color-accent); color:var(--color-paper); padding:14px 16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 0 var(--color-line); }
+  header a { color:var(--color-paper); text-decoration:none; font-weight:700; }
+  header a:last-child { background:var(--color-primary); border-radius:999px; padding:8px 13px; transition:background-color .18s ease, transform .18s ease; }
+  header a:last-child:hover { background:var(--color-primary-hover); transform:translateY(-1px); }
   main { max-width:720px; margin:0 auto; padding:16px; }
-  main > a { display:inline-block; margin-bottom:8px; }
-  h1 { font-size:24px; margin:8px 0 12px; }
-  .banner { background:#fee2e2; color:var(--red); font-weight:700; text-align:center; padding:8px; border-radius:10px; margin-bottom:12px; }
-  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:12px; }
+  h1 { color:var(--color-paper); font-size:24px; margin:8px 0 12px; }
+  main > a { display:inline-block; margin-bottom:8px; color:var(--color-paper); text-decoration-color:var(--color-secondary); text-underline-offset:3px; }
+  .banner { background:color-mix(in srgb, var(--color-secondary) 20%, var(--color-surface)); color:var(--color-paper); font-weight:700; text-align:center; padding:8px; border:1px solid color-mix(in srgb, var(--color-secondary) 40%, transparent); border-radius:10px; margin-bottom:12px; }
+  .card { background:var(--color-surface); color:var(--color-paper); border:1px solid var(--color-line); border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 10px 28px color-mix(in srgb, var(--color-accent) 30%, transparent); }
+  .card h1, .modal h2 { color:var(--color-paper); }
+  .card a:not(.btn) { color:var(--color-paper); text-decoration-color:var(--color-secondary); text-underline-offset:3px; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px; }
   .emoji { font-size:56px; text-align:center; }
-  .price { font-size:24px; font-weight:800; margin:6px 0; }
-  .muted { color:var(--muted); }
-  .urgent { color:var(--red); font-weight:700; margin:6px 0; }
-  .btn { display:inline-block; background:var(--brand); color:#fff; border:0; border-radius:10px; padding:12px 18px; font-size:16px; font-weight:700; cursor:pointer; text-decoration:none; }
-  .btn.green { background:var(--ok); width:100%; padding:14px; font-size:18px; }
+  .price { color:var(--color-primary); font-size:24px; font-weight:800; margin:6px 0; }
+  .muted { color:var(--color-muted); }
+  .urgent { color:var(--color-paper); font-weight:700; margin:6px 0; border-left:3px solid var(--color-secondary); border-radius:6px; padding:6px 9px; background:color-mix(in srgb, var(--color-secondary) 28%, var(--color-surface)); }
+  .btn { display:inline-block; background:var(--color-primary); color:var(--color-paper); border:0; border-radius:10px; padding:12px 18px; font-size:16px; font-weight:700; cursor:pointer; text-decoration:none; transition:background-color .18s ease, transform .18s ease; }
+  .btn:hover { background:var(--color-primary-hover); transform:translateY(-1px); }
+  .btn.green { background:var(--color-secondary); width:100%; padding:14px; font-size:18px; }
+  .btn.green:hover { background:var(--color-secondary-hover); }
   .btn[disabled] { opacity:.45; cursor:not-allowed; }
-  .tiny-link { background:none; border:0; color:#b8b2ad; font-size:11px; text-decoration:underline; cursor:pointer; margin-top:10px; }
-  .row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--line); }
-  .row.total { font-weight:800; font-size:18px; border-bottom:0; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible, input:focus-visible { outline:3px solid color-mix(in srgb, var(--color-secondary) 65%, var(--color-paper)); outline-offset:2px; }
+  .tiny-link { background:none; border:0; color:var(--color-muted); font-size:11px; text-decoration:underline; text-underline-offset:2px; cursor:pointer; margin-top:10px; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--color-line); }
+  .row.total { margin-top:6px; padding:12px 10px; border:0; border-top:1px solid var(--color-line); border-radius:8px; background:color-mix(in srgb, var(--color-primary) 28%, var(--color-surface)); color:var(--color-paper); font-weight:800; font-size:18px; }
   .chk { display:flex; gap:10px; align-items:flex-start; padding:8px 0; }
-  .fine { display:block; font-size:10px; color:#b8b2ad; }
+  .fine { display:block; font-size:10px; color:var(--color-muted); }
   label.field { display:block; font-weight:600; margin-top:8px; }
-  input[type=text], input[type=email] { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; margin:4px 0 8px; font-size:15px; }
-  .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:16px; }
-  .modal { background:#fff; border-radius:14px; padding:22px; max-width:380px; width:100%; text-align:center; }
-  footer { text-align:center; font-size:12px; color:var(--muted); padding:24px 16px 40px; }
+  input[type=text], input[type=email] { width:100%; padding:10px; border:1px solid var(--color-line); border-radius:8px; margin:4px 0 8px; font-size:15px; background:var(--color-surface-raised); color:var(--color-paper); }
+  input::placeholder { color:var(--color-muted); opacity:1; }
+  input[type=checkbox] { accent-color:var(--color-secondary); }
+  .modal-bg { position:fixed; inset:0; background:color-mix(in srgb, var(--color-accent) 45%, transparent); display:flex; align-items:center; justify-content:center; padding:16px; }
+  .modal { background:var(--color-surface); color:var(--color-paper); border:1px solid var(--color-line); box-shadow:0 24px 64px color-mix(in srgb, var(--color-accent) 45%, transparent); border-radius:14px; padding:22px; max-width:380px; width:100%; text-align:center; }
+  footer { text-align:center; font-size:12px; color:var(--color-footer); padding:24px 16px 40px; }
 </style>
 </head>
 <body>
