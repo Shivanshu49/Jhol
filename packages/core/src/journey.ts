@@ -1,19 +1,7 @@
 /**
- * Jhol × TinyFish — Agent API client (plain REST, no SDK needed).
- *
- * Serverless-friendly flow (works on Vercel, no long-running server):
- *   1. startJourneyRun(url)      → POST /v1/automation/run-async  → run_id right away
- *   2. getRun(run_id) every ~2s  → GET  /v1/runs/{id}             → status, streaming_url, result
- *   3. toJourney(run.result)     → typed JourneyResult for lib/detectors.ts
- *
- * Docs: https://docs.tinyfish.ai/agent-api/reference
- *       https://docs.tinyfish.ai/key-concepts/structured-output
- *
- * Env: TINYFISH_API_KEY — server-side only. Never prefix it with NEXT_PUBLIC_.
+ * Jhol journey contract: what the browser agent records and the detectors read.
+ * Don't change the shape of JourneyResult (see AGENTS.md).
  */
-
-/** Override with TINYFISH_API_BASE for a proxy (e.g. LiteLLM) or a local fake in tests. */
-const agentBase = () => (process.env.TINYFISH_API_BASE ?? "https://agent.tinyfish.ai/v1").replace(/\/+$/, "");
 
 /** Start session B this long after session A. The gap is what exposes countdowns that restart for every visitor. */
 export const SESSION_B_DELAY_MS = 120_000;
@@ -40,31 +28,6 @@ export type JourneyResult = {
   stop_reason: string;
   items_added_by_agent: string[];
   steps: JourneyStep[];
-};
-
-export type RunStatus = "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
-
-export type TinyFishRun = {
-  run_id: string;
-  status: RunStatus;
-  started_at: string | null;
-  finished_at: string | null;
-  num_of_steps: number | null; // = credits used by this run
-  streaming_url: string | null; // live browser view while RUNNING → show it in the UI
-  video_url: string | null; // run recording, if your account has it
-  result: unknown;
-  error: { code?: string; message?: string; help_message?: string; help_url?: string } | null;
-};
-
-export type RunOptions = {
-  /** Stealth browser profile for real sites with bot protection. Default: lite. */
-  stealth?: boolean;
-  /** Route through an Indian IP so prices, fees and offers are the Indian ones. */
-  indiaProxy?: boolean;
-  /** Pincode the agent types if a site asks for one. */
-  pincode?: string;
-  /** HTTPS URL TinyFish calls on run lifecycle events (we treat it as a "check this run now" nudge). */
-  webhookUrl?: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -130,61 +93,6 @@ export const JOURNEY_SCHEMA = {
   },
   required: ["reached_payment_page", "stop_reason", "items_added_by_agent", "steps"],
 };
-
-// ---------------------------------------------------------------------------
-// REST calls
-// ---------------------------------------------------------------------------
-
-function apiKey(): string {
-  const key = process.env.TINYFISH_API_KEY;
-  if (!key) throw new Error("TINYFISH_API_KEY is not set");
-  return key;
-}
-
-async function tinyfish<T>(path: string, init: { method?: "GET" | "POST"; body?: unknown } = {}): Promise<T> {
-  const res = await fetch(`${agentBase()}${path}`, {
-    method: init.method ?? "GET",
-    headers: { "X-API-Key": apiKey(), "Content-Type": "application/json" },
-    body: init.body === undefined ? undefined : JSON.stringify(init.body),
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`TinyFish ${res.status} on ${path}: ${text.slice(0, 400)}`);
-  return (text ? JSON.parse(text) : {}) as T;
-}
-
-/** Start one checkout-journey run. Returns TinyFish's run_id immediately. */
-export async function startJourneyRun(url: string, opts: RunOptions = {}): Promise<string> {
-  const body: Record<string, unknown> = {
-    url,
-    goal: checkoutGoal(opts.pincode),
-    output_schema: JOURNEY_SCHEMA,
-    browser_profile: opts.stealth ? "stealth" : "lite",
-  };
-  if (opts.indiaProxy) {
-    body.proxy_config = { enabled: true, type: "tinyfish", country_code: "IN" };
-  }
-  if (opts.webhookUrl?.startsWith("https://")) {
-    body.webhook_url = opts.webhookUrl; // TinyFish only accepts https webhooks
-  }
-  // Don't add agent_config.max_steps unless your account is in TinyFish's beta — it returns 403 otherwise.
-  // Cap spend with cancelRun() from your poller instead.
-  const res = await tinyfish<{ run_id: string | null; error: unknown }>("/automation/run-async", {
-    method: "POST",
-    body,
-  });
-  if (!res.run_id) throw new Error(`TinyFish did not create a run: ${JSON.stringify(res.error)}`);
-  return res.run_id;
-}
-
-/** Poll this from your API route. Carries status, the live-view URL while running, and the result when done. */
-export function getRun(runId: string): Promise<TinyFishRun> {
-  return tinyfish<TinyFishRun>(`/runs/${encodeURIComponent(runId)}`);
-}
-
-/** Stop a run that's taking too long, so it stops eating credits. */
-export function cancelRun(runId: string): Promise<{ run_id: string; status: string }> {
-  return tinyfish(`/runs/${encodeURIComponent(runId)}/cancel`, { method: "POST" });
-}
 
 // ---------------------------------------------------------------------------
 // Normalise whatever comes back into a safe JourneyResult

@@ -8,6 +8,9 @@ coverage
 .env
 .env.local
 .env.*.local
+.env.bak
+packages/core/pnpm-lock.yaml
 .DS_Store
 .vercel
 next-env.d.ts
+runs/

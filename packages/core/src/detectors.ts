@@ -1,5 +1,5 @@
 /**
- * Jhol detectors — turn a TinyFish journey into findings.
+ * Jhol detectors — turn a checkout journey into findings.
  *
  * Pattern names follow the 13 dark patterns in CCPA's Guidelines for Prevention and
  * Regulation of Dark Patterns, 2023.
@@ -9,7 +9,7 @@
  *    an LLM via buildJudgePrompt() → your model → parseJudge(), which drops any finding
  *    whose quote the agent never actually captured.
  */
-import type { JourneyResult, LineItem } from "./tinyfish";
+import type { JourneyResult, LineItem } from "./journey";
 
 export type Pattern =
   | "false_urgency"
@@ -37,7 +37,7 @@ export type Finding = {
   source: "rule" | "llm";
 };
 
-/** One agent run plus when it started (TinyFish run.started_at). */
+/** One agent run plus when it started. */
 export type Session = { result: JourneyResult; startedAt: string | Date };
 
 const FEE_RE = /fee|charge|handling|platform|convenience|surge|packag|service|delivery|shipping/i;
@@ -236,7 +236,7 @@ export function detectNagging(r: JourneyResult, minPages = 3): Finding[] {
 }
 
 // ---------------------------------------------------------------------------
-// False urgency — needs two sessions ~2 min apart (SESSION_B_DELAY_MS in tinyfish.ts)
+// False urgency — needs two sessions ~2 min apart (SESSION_B_DELAY_MS in journey.ts)
 //  - a real deadline keeps counting down between visits; a fake one restarts for every visitor
 //  - stock that goes UP within minutes isn't real stock
 // ---------------------------------------------------------------------------

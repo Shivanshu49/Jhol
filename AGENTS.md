@@ -13,7 +13,8 @@ Jhol shops an e-commerce site like a real customer (never pays), records every c
 - JourneyResult (packages/core/src/journey.ts) is the contract between the agent and the detectors. Don't change its shape.
 - Don't edit detectors.ts unless the task says so; its tests must keep passing.
 - The agent must never enter card, CVV, UPI, OTP or password data and must stop at the payment step.
-- Secrets only via env (OPENAI_API_KEY, SUPABASE_*, JHOL_API_KEY). Never log them.
+- Secrets only via env (OPENAI_API_KEY, CEREBRAS_API_KEY, EXA_API_KEY, SUPABASE_*, JHOL_API_KEY). Never log them.
+- Agent LLM: AGENT_LLM=cerebras|openai (default cerebras; CLI flag --llm). The LLM judge always uses OpenAI.
 - Use child_process with argument arrays, never shell strings built from user input.
 - TypeScript strict. Run before finishing: pnpm turbo run build && pnpm --filter @jhol/core test && pnpm --filter @jhol/api test:e2e
 

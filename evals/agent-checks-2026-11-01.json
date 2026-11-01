@@ -1,0 +1,91 @@
+[
+  {
+    "run": 1,
+    "passed": true,
+    "payments": [
+      true
+    ],
+    "price": "499 → 606",
+    "drip_pricing": 2,
+    "basket_sneaking": 2,
+    "subscription_trap": 1,
+    "nagging": 1,
+    "false_urgency": 0,
+    "times": [
+      {
+        "steps": 16,
+        "seconds": 55
+      }
+    ],
+    "totalSeconds": 54.5,
+    "exit": 0
+  },
+  {
+    "run": 2,
+    "passed": true,
+    "payments": [
+      true
+    ],
+    "price": "499 → 606",
+    "drip_pricing": 2,
+    "basket_sneaking": 2,
+    "subscription_trap": 1,
+    "nagging": 1,
+    "false_urgency": 0,
+    "times": [
+      {
+        "steps": 19,
+        "seconds": 80
+      }
+    ],
+    "totalSeconds": 80.3,
+    "exit": 0
+  },
+  {
+    "run": 3,
+    "passed": true,
+    "payments": [
+      true
+    ],
+    "price": "499 → 606",
+    "drip_pricing": 2,
+    "basket_sneaking": 2,
+    "subscription_trap": 1,
+    "nagging": 1,
+    "false_urgency": 0,
+    "times": [
+      {
+        "steps": 19,
+        "seconds": 66
+      }
+    ],
+    "totalSeconds": 65.8,
+    "exit": 0
+  },
+  {
+    "run": "twice",
+    "passed": true,
+    "payments": [
+      true,
+      true
+    ],
+    "price": "499 → 606",
+    "drip_pricing": 2,
+    "basket_sneaking": 2,
+    "subscription_trap": 1,
+    "nagging": 1,
+    "false_urgency": 2,
+    "times": [
+      {
+        "steps": 20,
+        "seconds": 80
+      },
+      {
+        "steps": 18,
+        "seconds": 65
+      }
+    ],
+    "totalSeconds": 144.6,
+    "exit": 0
+  }
+]
