@@ -29,3 +29,7 @@ An initial live audit was interrupted by a development reload. Retried against a
 ## D — Passed
 
 Ran `pnpm --filter @jhol/core eval --runs 3` against the original port-5050 store with the OpenAI agent and the same OpenAI judge used by the worker. Every audit reached payment. Donation, protection, subscription trap, confirm shaming, both hidden fees and nagging were caught in 3/3 runs. Timer and stock false urgency were 0/3 because this command uses one session; Step A separately verified the two-session check. Interface interference is marked not supported and excluded. Coverage: 18/24 supported case-runs (75%), average 18.7 steps and 60.4s. These are coverage results, not a measurement of false positives. Results: `evals/results-2026-11-01T07-52-40-904Z.json`. Build, 15 core tests and 10 API e2e tests pass.
+
+## E — Skipped by the requested condition
+
+CEREBRAS_API_KEY is empty or absent in apps/api/.env. No Cerebras request was made and no provider comparison is claimed. Provider selection, the --llm flag, gpt-oss-120b at https://api.cerebras.ai/v1, the compact snapshot and json_object fallback are already implemented. Measured OpenAI Step-A totals: 54.5s, 80.3s and 65.8s (two-session total: 144.6s). Cerebras total: not measured.
