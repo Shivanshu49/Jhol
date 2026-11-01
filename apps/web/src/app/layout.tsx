@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/600.css";
+import "@fontsource/kalam/400.css";
+import "@fontsource/kalam/700.css";
 import { MotionProvider } from "./motion-provider";
 import "./globals.css";
 

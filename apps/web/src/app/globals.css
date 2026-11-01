@@ -1,12 +1,5 @@
 @import "tailwindcss";
 
-/* Self-hosted fonts (no Google Fonts call at runtime) */
-@import "@fontsource-variable/archivo/wdth.css";
-@import "@fontsource/ibm-plex-mono/400.css";
-@import "@fontsource/ibm-plex-mono/600.css";
-@import "@fontsource/kalam/400.css";
-@import "@fontsource/kalam/700.css";
-
 /*
   Jhol palette: a shop counter, a thermal receipt, an auditor's pens.
   desk     #E6E9EC  cool grey counter top
