@@ -14,3 +14,4 @@ packages/core/pnpm-lock.yaml
 .vercel
 next-env.d.ts
 runs/
+demo-video/
