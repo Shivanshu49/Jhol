@@ -21,6 +21,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run build
+      - name: Install Playwright Chromium
+        run: pnpm --filter @jhol/core exec playwright install --with-deps chromium
       - name: Detector tests
         run: pnpm --filter @jhol/core test
       - name: Pipeline e2e (stub agent, real Redis)
