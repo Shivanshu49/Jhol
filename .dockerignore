@@ -3,5 +3,7 @@
 **/.next
 **/.turbo
 .git
-**/.env
-**/.env.local
+**/.env*
+!**/.env.example
+**/runs
+packages/core/pnpm-lock.yaml

@@ -8,10 +8,10 @@ import { parseCreateAudit } from "./create-audit";
 export class AuditsController {
   constructor(private readonly audits: AuditsService) {}
 
-  /** POST /audits  { url, sessions?: 1|2, stealth?, indiaProxy?, pincode? }  →  { id } */
+  /** POST /audits  { url, sessions?: 1|2, pincode? }  →  { id } */
   @Post()
   async create(@Body() body: unknown) {
-    const audit = await this.audits.create(parseCreateAudit(body));
+    const audit = await this.audits.create(await parseCreateAudit(body));
     return { id: audit.id };
   }
 

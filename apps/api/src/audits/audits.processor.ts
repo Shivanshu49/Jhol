@@ -1,41 +1,45 @@
-import { Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Logger } from "@nestjs/common";
 import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import type { Job, Queue } from "bullmq";
 import {
-  cancelRun,
-  getRun,
+  type AgentStepEvent,
+  findPrecedents,
   jholScore,
+  type Precedent,
+  runJourney,
   runRuleDetectors,
   sealReport,
-  startJourneyRun,
-  toJourney,
 } from "@jhol/core";
-import { DbService, type RunRow } from "../common/db.service";
-import {
-  AUDIT_QUEUE,
-  JOB,
-  KEEP,
-  TERMINAL,
-  timing,
-  type CheckRunJob,
-  type FinalizeJob,
-  type StartSessionJob,
-} from "../common/queue";
+import { DbService } from "../common/db.service";
+import { AUDIT_QUEUE, JOB, KEEP, type FinalizeJob, type Session, TERMINAL, type StartSessionJob } from "../common/queue";
+import { allowPrivateTargets } from "./create-audit";
 import { JudgeService } from "./judge.service";
+
+const PRECEDENTS_TTL_MS = 24 * 60 * 60 * 1000; // search each pattern at most once a day
+
+/** Provider token for the browser agent, so tests can swap in a stub. */
+export const RUN_JOURNEY = "RUN_JOURNEY";
+export type RunJourney = typeof runJourney;
+
+/** "click "Add to cart"", "fill "Email" = "test@example.com"", "stop" — what the step log shows. */
+const describe = (s: AgentStepEvent) =>
+  [s.action.type, s.targetText && JSON.stringify(s.targetText), s.action.value && `= ${JSON.stringify(s.action.value)}`]
+    .filter(Boolean)
+    .join(" ");
 
 /**
  * The audit pipeline. Every step is idempotent, so retries and duplicate jobs are safe:
- *   start-session → check-run (poll every 5s, or nudged by TinyFish's webhook) → finalize
+ *   start-session (runs the browser agent in this process, ~1 min) → finalize
+ * lockDuration covers a whole agent run; BullMQ renews the lock while the job is alive.
  */
-@Processor(AUDIT_QUEUE, { concurrency: 5 })
+@Processor(AUDIT_QUEUE, { concurrency: 5, lockDuration: 120_000 })
 export class AuditsProcessor extends WorkerHost {
   private readonly log = new Logger(AuditsProcessor.name);
 
   constructor(
     private readonly db: DbService,
     private readonly judge: JudgeService,
-    private readonly config: ConfigService,
+    @Inject(RUN_JOURNEY) private readonly runJourney: RunJourney,
     @InjectQueue(AUDIT_QUEUE) private readonly queue: Queue,
   ) {
     super();
@@ -45,8 +49,6 @@ export class AuditsProcessor extends WorkerHost {
     switch (job.name) {
       case JOB.START_SESSION:
         return this.startSession(job.data as StartSessionJob);
-      case JOB.CHECK_RUN:
-        return this.checkRun(job.data as CheckRunJob);
       case JOB.FINALIZE:
         return this.finalize((job.data as FinalizeJob).auditId);
       default:
@@ -54,75 +56,60 @@ export class AuditsProcessor extends WorkerHost {
     }
   }
 
-  // ---------------------------------------------------------------- start
+  // ---------------------------------------------------------------- run the agent
 
   private async startSession({ auditId, session }: StartSessionJob): Promise<string> {
     const audit = await this.db.getAudit(auditId);
     if (!audit || audit.status !== "running") return "skipped: audit no longer running";
 
     const existing = (await this.db.getRuns(auditId)).find((r) => r.session === session);
-    if (existing?.tinyfish_run_id) return "skipped: already started";
+    if (existing && TERMINAL.has(existing.status)) {
+      await this.enqueueFinalize(auditId);
+      return "skipped: already finished";
+    }
 
-    const tinyfishRunId = await startJourneyRun(audit.url, { ...audit.options, webhookUrl: this.webhookUrl() });
-    const run = await this.db.upsertRun({ audit_id: auditId, session, tinyfish_run_id: tinyfishRunId, status: "PENDING" });
-    await this.enqueueCheck(run.id, 0, timing().firstCheckMs);
-    this.log.log(`audit ${auditId} · session ${session} → TinyFish run ${tinyfishRunId}`);
-    return tinyfishRunId;
+    const run = await this.db.upsertRun({ audit_id: auditId, session, status: "RUNNING", started_at: new Date().toISOString(), error: null });
+    this.log.log(`audit ${auditId} · session ${session} → agent on ${audit.url}`);
+    let outcome: string;
+    try {
+      const { stepsTaken, ...journey } = await this.runJourney(audit.url, {
+        pincode: audit.options.pincode,
+        allowPrivateNetwork: allowPrivateTargets(),
+        onStep: (step) => this.saveStep(auditId, session, run.id, step),
+      });
+      await this.db.updateRun(run.id, { status: "COMPLETED", result: journey, num_steps: stepsTaken });
+      outcome = `completed in ${stepsTaken} steps`;
+    } catch (err) {
+      await this.db.updateRun(run.id, { status: "FAILED", error: (err as Error).message });
+      outcome = `failed: ${(err as Error).message}`;
+    }
+    await this.enqueueFinalize(auditId);
+    return outcome;
   }
 
-  private webhookUrl(): string | undefined {
-    const base = this.config.get<string>("PUBLIC_API_URL");
-    const secret = this.config.get<string>("WEBHOOK_SECRET");
-    if (!base || !secret) return undefined;
-    return `${base.replace(/\/+$/, "")}/webhooks/tinyfish?token=${encodeURIComponent(secret)}`;
-  }
-
-  // ---------------------------------------------------------------- poll
-
-  private async checkRun({ runRowId, checks, oneShot }: CheckRunJob): Promise<string> {
-    const run = await this.db.getRun(runRowId);
-    if (!run?.tinyfish_run_id) return "skipped: no run";
-    if (TERMINAL.has(run.status)) return "skipped: already finished";
-
-    const tf = await getRun(run.tinyfish_run_id);
-    const live: Partial<RunRow> = {
-      status: tf.status,
-      streaming_url: tf.streaming_url ?? run.streaming_url,
-      video_url: tf.video_url ?? run.video_url,
-      started_at: tf.started_at ?? run.started_at,
-      num_steps: tf.num_of_steps ?? run.num_steps,
-    };
-
-    if (tf.status === "COMPLETED") {
-      const journey = toJourney(tf.result);
-      await this.db.updateRun(
-        run.id,
-        journey
-          ? { ...live, result: journey }
-          : { ...live, status: "FAILED", error: "TinyFish result did not match the journey schema" },
-      );
-      await this.enqueueFinalize(run.audit_id);
-      return "completed";
+  /** Live step log + screenshot. Never throws: a lost screenshot must not fail the audit. */
+  private async saveStep(auditId: string, session: Session, runId: string, step: AgentStepEvent): Promise<void> {
+    const path = `${auditId}/${session}/${step.index}.jpg`;
+    let screenshotPath: string | null = null;
+    try {
+      await this.db.uploadScreenshot(path, step.screenshot);
+      screenshotPath = path;
+    } catch (e) {
+      this.log.warn(`screenshot ${step.index} of ${auditId}/${session} not saved: ${(e as Error).message}`);
     }
-
-    if (tf.status === "FAILED" || tf.status === "CANCELLED") {
-      await this.db.updateRun(run.id, { ...live, error: tf.error?.help_message ?? tf.error?.message ?? tf.status });
-      await this.enqueueFinalize(run.audit_id);
-      return tf.status.toLowerCase();
+    try {
+      await this.db.upsertStep({
+        run_id: runId,
+        idx: step.index,
+        page: step.page,
+        action: describe(step),
+        reason: [step.action.reason, step.error ? `Action failed: ${step.error}` : null].filter(Boolean).join(" · "),
+        screenshot_path: screenshotPath,
+        total_shown: step.newFindingsHint.total_shown,
+      });
+    } catch (e) {
+      this.log.warn(`step ${step.index} of ${auditId}/${session} not saved: ${(e as Error).message}`);
     }
-
-    await this.db.updateRun(run.id, live);
-    if (oneShot) return "nudged"; // webhook nudge: the regular polling chain keeps going
-
-    if (checks >= timing().maxChecks) {
-      await cancelRun(run.tinyfish_run_id).catch(() => undefined);
-      await this.db.updateRun(run.id, { status: "FAILED", error: "Timed out; cancelled to save credits" });
-      await this.enqueueFinalize(run.audit_id);
-      return "timed out";
-    }
-
-    await this.enqueueCheck(run.id, checks + 1);
-    return "still running";
   }
 
   // ---------------------------------------------------------------- finalize
@@ -152,12 +139,13 @@ export class AuditsProcessor extends WorkerHost {
       const llmFindings = await this.judge.judge(a.result);
       const all = [...findings, ...llmFindings];
       const score = jholScore(all);
+      const precedents = await this.precedents([...new Set(all.map((f) => f.pattern))]);
       const report_hash = await sealReport({
         auditId,
         url: audit.url,
         drift,
         findings: all,
-        tinyfishRuns: runs.map((r) => r.tinyfish_run_id),
+        runs: runs.map((r) => ({ session: r.session, started_at: r.started_at, num_steps: r.num_steps })),
       });
 
       await this.db.insertFindings(auditId, all);
@@ -167,6 +155,7 @@ export class AuditsProcessor extends WorkerHost {
         price_final: drift?.final ?? null,
         score,
         report_hash,
+        precedents,
       });
       this.log.log(`audit ${auditId} done · ${all.length} findings · score ${score}`);
       return "done";
@@ -176,12 +165,28 @@ export class AuditsProcessor extends WorkerHost {
     }
   }
 
-  // ---------------------------------------------------------------- helpers
-
-  private enqueueCheck(runRowId: string, checks: number, delay = timing().pollEveryMs) {
-    const data: CheckRunJob = { runRowId, checks };
-    return this.queue.add(JOB.CHECK_RUN, data, { delay, attempts: 3, backoff: { type: "exponential", delay: 5_000 }, ...KEEP });
+  /** Up to 3 news/government precedents per pattern, cached in Supabase for a day. Never throws: no precedents is fine. */
+  private async precedents(patterns: string[]): Promise<Record<string, Precedent[]>> {
+    const out: Record<string, Precedent[]> = {};
+    await Promise.all(
+      patterns.map(async (pattern) => {
+        try {
+          const cached = await this.db.getPrecedents(pattern).catch(() => null);
+          const fresh = cached !== null && Date.now() - Date.parse(cached.fetched_at) < PRECEDENTS_TTL_MS;
+          const results = fresh ? cached.results : await findPrecedents(pattern);
+          if (!fresh) {
+            await this.db.savePrecedents(pattern, results).catch((e: Error) => this.log.warn(`precedents cache (${pattern}): ${e.message}`));
+          }
+          if (results.length) out[pattern] = results;
+        } catch (e) {
+          this.log.warn(`no precedents for ${pattern}: ${(e as Error).message}`);
+        }
+      }),
+    );
+    return out;
   }
+
+  // ---------------------------------------------------------------- helpers
 
   private enqueueFinalize(auditId: string) {
     const data: FinalizeJob = { auditId };
@@ -199,20 +204,8 @@ export class AuditsProcessor extends WorkerHost {
     try {
       if (job.name === JOB.START_SESSION) {
         const { auditId, session } = job.data as StartSessionJob;
-        await this.db.upsertRun({
-          audit_id: auditId,
-          session,
-          tinyfish_run_id: null,
-          status: "FAILED",
-          error: `Could not start TinyFish run: ${err.message}`,
-        });
+        await this.db.upsertRun({ audit_id: auditId, session, status: "FAILED", error: `Agent run failed: ${err.message}` });
         await this.enqueueFinalize(auditId);
-      } else if (job.name === JOB.CHECK_RUN) {
-        const run = await this.db.getRun((job.data as CheckRunJob).runRowId);
-        if (run && !TERMINAL.has(run.status)) {
-          await this.db.updateRun(run.id, { status: "FAILED", error: `Lost track of the run: ${err.message}` });
-          await this.enqueueFinalize(run.audit_id);
-        }
       }
     } catch (e) {
       this.log.error(`Could not record failure of ${job.name} ${job.id}: ${(e as Error).message}`);

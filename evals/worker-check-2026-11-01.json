@@ -1,0 +1,27 @@
+{
+  "id": "59858167-b86d-4223-9478-caeb65e11985",
+  "status": "done",
+  "price": "499 → 606",
+  "score": 0,
+  "findings": {
+    "drip_pricing": 2,
+    "basket_sneaking": 2,
+    "subscription_trap": 1,
+    "false_urgency": 1,
+    "nagging": 1,
+    "confirm_shaming": 1
+  },
+  "runs": [
+    {
+      "session": "A",
+      "reached_payment_page": true,
+      "steps": 0
+    },
+    {
+      "session": "B",
+      "reached_payment_page": true,
+      "steps": 0
+    }
+  ],
+  "persistedSteps": 0
+}

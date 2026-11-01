@@ -9,6 +9,7 @@ RUN corepack enable
 WORKDIR /repo
 COPY . .
 RUN pnpm install --frozen-lockfile --filter "@jhol/api..."
+RUN pnpm --filter @jhol/core exec playwright install --with-deps chromium
 RUN pnpm --filter @jhol/core build && pnpm --filter @jhol/api build
 
 WORKDIR /repo/apps/api

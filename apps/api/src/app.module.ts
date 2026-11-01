@@ -4,7 +4,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { BullModule } from "@nestjs/bullmq";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AuditsController } from "./audits/audits.controller";
-import { AuditsProcessor } from "./audits/audits.processor";
+import { runJourney } from "@jhol/core";
+import { AuditsProcessor, RUN_JOURNEY } from "./audits/audits.processor";
 import { AuditsService } from "./audits/audits.service";
 import { JudgeService } from "./audits/judge.service";
 import { DbService } from "./common/db.service";
@@ -12,7 +13,6 @@ import { AUDIT_QUEUE } from "./common/queue";
 import { redisConnection } from "./common/redis";
 import type { Role } from "./common/role";
 import { HealthController } from "./health.controller";
-import { WebhooksController } from "./webhooks/webhooks.controller";
 
 @Module({})
 export class AppModule {
@@ -33,11 +33,11 @@ export class AppModule {
         BullModule.registerQueue({ name: AUDIT_QUEUE }),
         ...(serveHttp ? [ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }])] : []),
       ],
-      controllers: serveHttp ? [HealthController, AuditsController, WebhooksController] : [],
+      controllers: serveHttp ? [HealthController, AuditsController] : [],
       providers: [
         DbService,
         AuditsService,
-        ...(runJobs ? [AuditsProcessor, JudgeService] : []),
+        ...(runJobs ? [AuditsProcessor, JudgeService, { provide: RUN_JOURNEY, useValue: runJourney }] : []),
         ...(serveHttp ? [{ provide: APP_GUARD, useClass: ThrottlerGuard }] : []),
       ],
     };

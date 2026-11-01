@@ -38,7 +38,10 @@ export type Audit = {
   finished_at: string | null;
 };
 
-export type AuditView = { audit: Audit; runs: Run[]; findings: Finding[] };
+/** A news / government page where regulators acted on the same dark pattern (Exa search). */
+export type Precedent = { title: string; url: string; publishedDate?: string; snippet: string };
+
+export type AuditView = { audit: Audit; runs: Run[]; findings: Finding[]; precedents?: Record<string, Precedent[]> };
 
 /** CCPA's 13 dark patterns (Guidelines for Prevention and Regulation of Dark Patterns, 2023). */
 export const PATTERNS: Record<string, { label: string; what: string }> = {

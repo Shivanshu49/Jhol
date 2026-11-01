@@ -6,7 +6,7 @@ import { AUDIT_QUEUE, JOB, KEEP, timing, type StartSessionJob } from "../common/
 import type { CreateAuditInput } from "./create-audit";
 
 const RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
-const START_RETRY = { attempts: 5, backoff: { type: "exponential", delay: 30_000 } }; // rides out TinyFish 429s
+const START_RETRY = { attempts: 3, backoff: { type: "exponential", delay: 10_000 } }; // agent errors are caught; this rides out Supabase/Redis blips
 
 @Injectable()
 export class AuditsService {
@@ -43,15 +43,21 @@ export class AuditsService {
     const audit = await this.db.getAudit(id);
     if (!audit) return null;
     const [runs, findings] = await Promise.all([this.db.getRuns(id), this.db.getFindings(id)]);
+    const steps = await this.db.getSteps(runs.map((r) => r.id));
+    const { precedents, ...rest } = audit;
     return {
-      audit,
+      audit: rest,
       runs: runs.map(({ result, ...run }) => ({
         ...run,
         reached_payment_page: result?.reached_payment_page ?? null,
         stop_reason: result?.stop_reason ?? null,
         pages: result?.steps.map((s) => s.page) ?? [],
+        steps: steps
+          .filter((s) => s.run_id === run.id)
+          .map(({ run_id, screenshot_path, ...s }) => ({ ...s, screenshot_url: screenshot_path ? this.db.screenshotUrl(screenshot_path) : null })),
       })),
       findings: [...findings].sort((x, y) => (RANK[x.severity] ?? 9) - (RANK[y.severity] ?? 9)),
+      precedents: precedents ?? {}, // { [pattern]: [{ title, url, publishedDate?, snippet }] }
     };
   }
 }

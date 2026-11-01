@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { Finding, JourneyResult } from "@jhol/core";
+import type { Finding, JourneyResult, Precedent } from "@jhol/core";
 import type { Session } from "./queue";
 
 export type AuditStatus = "running" | "finalizing" | "done" | "failed";
-export type AuditOptions = { stealth?: boolean; indiaProxy?: boolean; pincode?: string };
+export type AuditOptions = { pincode?: string };
 
 export type AuditRow = {
   id: string;
@@ -19,6 +19,7 @@ export type AuditRow = {
   price_final: number | null;
   score: number | null;
   report_hash: string | null;
+  precedents: Record<string, Precedent[]>;
   created_at: string;
   finished_at: string | null;
 };
@@ -27,10 +28,7 @@ export type RunRow = {
   id: string;
   audit_id: string;
   session: Session;
-  tinyfish_run_id: string | null;
-  status: string;
-  streaming_url: string | null;
-  video_url: string | null;
+  status: string; // RUNNING | COMPLETED | FAILED
   started_at: string | null;
   num_steps: number | null;
   result: JourneyResult | null;
@@ -38,7 +36,21 @@ export type RunRow = {
   created_at: string;
 };
 
+export type StepRow = {
+  run_id: string;
+  idx: number;
+  page: string;
+  action: string;
+  reason: string | null;
+  screenshot_path: string | null;
+  total_shown: number | null;
+};
+
+export const SCREENS_BUCKET = "screens";
+
 export type FindingRow = Finding & { id: string; audit_id: string; created_at: string };
+
+export type PrecedentRow = { pattern: string; results: Precedent[]; fetched_at: string };
 
 type Res<T> = { data: T | null; error: { message: string } | null };
 
@@ -46,6 +58,8 @@ type Res<T> = { data: T | null; error: { message: string } | null };
 @Injectable()
 export class DbService {
   private readonly sb: SupabaseClient;
+  private readonly log = new Logger(DbService.name);
+  private warnedMissingSteps = false;
 
   constructor(config: ConfigService) {
     this.sb = createClient(config.getOrThrow<string>("SUPABASE_URL"), config.getOrThrow<string>("SUPABASE_SERVICE_ROLE_KEY"), {
@@ -105,27 +119,10 @@ export class DbService {
 
   // ---------- runs ----------
 
-  async upsertRun(input: {
-    audit_id: string;
-    session: Session;
-    tinyfish_run_id: string | null;
-    status?: string;
-    error?: string;
-  }): Promise<RunRow> {
+  async upsertRun(input: Partial<RunRow> & { audit_id: string; session: Session }): Promise<RunRow> {
     return this.must(
       await this.sb.from("runs").upsert(input, { onConflict: "audit_id,session" }).select().single(),
       "upsert run",
-    );
-  }
-
-  async getRun(id: string): Promise<RunRow | null> {
-    return this.must(await this.sb.from("runs").select("*").eq("id", id).maybeSingle(), "get run");
-  }
-
-  async getRunByTinyfishId(tinyfishRunId: string): Promise<RunRow | null> {
-    return this.must(
-      await this.sb.from("runs").select("*").eq("tinyfish_run_id", tinyfishRunId).maybeSingle(),
-      "get run by tinyfish id",
     );
   }
 
@@ -135,6 +132,32 @@ export class DbService {
 
   async updateRun(id: string, patch: Partial<RunRow>): Promise<void> {
     this.must(await this.sb.from("runs").update(patch).eq("id", id).select("id"), "update run");
+  }
+
+  // ---------- agent steps + screenshots ----------
+
+  async uploadScreenshot(path: string, jpeg: Buffer): Promise<void> {
+    const { error } = await this.sb.storage.from(SCREENS_BUCKET).upload(path, jpeg, { contentType: "image/jpeg", upsert: true });
+    if (error) throw new Error(`upload screenshot: ${error.message}`);
+  }
+
+  screenshotUrl(path: string): string {
+    return this.sb.storage.from(SCREENS_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+
+  async upsertStep(step: StepRow): Promise<void> {
+    this.must(await this.sb.from("run_steps").upsert(step, { onConflict: "run_id,idx" }).select("id"), "save step");
+  }
+
+  async getSteps(runIds: string[]): Promise<StepRow[]> {
+    if (!runIds.length) return [];
+    const res = await this.sb.from("run_steps").select("run_id, idx, page, action, reason, screenshot_path, total_shown").in("run_id", runIds).order("idx");
+    if (res.error && ["42P01", "PGRST205"].includes(res.error.code)) {
+      if (!this.warnedMissingSteps) this.log.warn("Step history unavailable: run supabase/migrations/0003_agent_steps.sql in Supabase.");
+      this.warnedMissingSteps = true;
+      return [];
+    }
+    return this.must(res, "get steps");
   }
 
   // ---------- findings ----------
@@ -154,6 +177,19 @@ export class DbService {
     return this.must(
       await this.sb.from("findings").select("*").eq("audit_id", auditId).order("created_at"),
       "get findings",
+    );
+  }
+
+  // ---------- precedents (Exa cache, one row per pattern) ----------
+
+  async getPrecedents(pattern: string): Promise<PrecedentRow | null> {
+    return this.must(await this.sb.from("precedents").select("*").eq("pattern", pattern).maybeSingle(), "get precedents");
+  }
+
+  async savePrecedents(pattern: string, results: Precedent[]): Promise<void> {
+    this.must(
+      await this.sb.from("precedents").upsert({ pattern, results, fetched_at: new Date().toISOString() }).select("pattern"),
+      "save precedents",
     );
   }
 }

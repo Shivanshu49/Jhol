@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { PATTERNS, rupees, type AuditView, type Finding, type Run } from "@/lib/types";
+import { PATTERNS, rupees, type AuditView, type Finding, type Precedent, type Run } from "@/lib/types";
 
 const ACTIVE = new Set(["running", "finalizing"]);
 
@@ -171,7 +171,7 @@ function Report({ view, findings }: { view: AuditView; findings: Finding[] }) {
         ) : (
           <ul className="space-y-3">
             {findings.map((f) => (
-              <FindingCard key={f.id} finding={f} />
+              <FindingCard key={f.id} finding={f} precedents={view.precedents?.[f.pattern] ?? []} />
             ))}
           </ul>
         )}
@@ -186,7 +186,7 @@ function Report({ view, findings }: { view: AuditView; findings: Finding[] }) {
   );
 }
 
-function FindingCard({ finding: f }: { finding: Finding }) {
+function FindingCard({ finding: f, precedents }: { finding: Finding; precedents: Precedent[] }) {
   const pattern = PATTERNS[f.pattern] ?? { label: f.pattern, what: "" };
   return (
     <li className="space-y-2 rounded-2xl border border-ink/10 bg-white p-4">
@@ -204,8 +204,34 @@ function FindingCard({ finding: f }: { finding: Finding }) {
         <blockquote className="rounded-lg bg-paper px-3 py-2 font-mono text-sm">{f.evidence}</blockquote>
       )}
       {f.detail && <p className="text-sm text-ink/70">{f.detail}</p>}
+      {precedents.length > 0 && (
+        <div className="border-t border-dashed border-ink/15 pt-2">
+          <p className="text-xs font-bold uppercase tracking-widest text-ink/50">Regulators have acted on this before</p>
+          <ul className="mt-1 space-y-1 text-sm">
+            {precedents.slice(0, 2).map((p) => (
+              <li key={p.url}>
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={p.snippet || undefined}
+                  className="text-bluepen underline underline-offset-2 hover:no-underline"
+                >
+                  {p.title}
+                </a>
+                {shortDate(p.publishedDate) && <span className="text-ink/50"> · {shortDate(p.publishedDate)}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </li>
   );
+}
+
+function shortDate(iso?: string) {
+  const d = iso ? new Date(iso) : null;
+  return d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "";
 }
 
 function statusText(status: string) {
