@@ -4,3 +4,4 @@ export * from "./agent";
 export * from "./netguard";
 export * from "./precedents";
 export * from "./detectors";
+export * from "./judge";

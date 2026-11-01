@@ -1,7 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import OpenAI from "openai";
-import { buildJudgePrompt, parseJudge, type Finding, type JourneyResult } from "@jhol/core";
+import { judgeJourney, type Finding, type JourneyResult } from "@jhol/core";
 
 /**
  * LLM judge for wording-based dark patterns (confirm shaming, trick questions, disguised ads, forced action).
@@ -20,13 +19,7 @@ export class JudgeService {
     const model = this.config.get<string>("OPENAI_MODEL");
     if (!apiKey || !model) return [];
     try {
-      const client = new OpenAI({ apiKey, baseURL: this.config.get<string>("OPENAI_BASE_URL") || undefined, timeout: 60_000 });
-      const res = await client.chat.completions.create({
-        model,
-        max_completion_tokens: 1500,
-        messages: [{ role: "user", content: buildJudgePrompt(journey) }],
-      });
-      return parseJudge(res.choices[0]?.message?.content ?? "", journey);
+      return await judgeJourney(journey, { apiKey, model, baseURL: this.config.get<string>("OPENAI_BASE_URL") });
     } catch (err) {
       this.log.warn(`Judge skipped: ${(err as Error).message}`);
       return [];

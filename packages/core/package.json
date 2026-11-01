@@ -13,7 +13,8 @@
     "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test \"test/*.test.cjs\"",
-    "agent": "node --env-file-if-exists=../../apps/api/.env dist/cli.js"
+    "agent": "node --env-file-if-exists=../../apps/api/.env dist/cli.js",
+    "eval": "node --env-file-if-exists=../../apps/api/.env dist/eval.js"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",

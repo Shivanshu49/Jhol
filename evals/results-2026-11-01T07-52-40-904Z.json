@@ -1,0 +1,792 @@
+{
+  "timestamp": "2026-11-01T07:52:40.904Z",
+  "url": "http://localhost:5050/chalak-mart.html",
+  "twice": false,
+  "sessionBDelayMs": null,
+  "cases": [
+    {
+      "id": "P1",
+      "pattern": "false_urgency",
+      "supported": true,
+      "caught": 0,
+      "runs": 3
+    },
+    {
+      "id": "P2",
+      "pattern": "false_urgency",
+      "supported": true,
+      "caught": 0,
+      "runs": 3
+    },
+    {
+      "id": "P3",
+      "pattern": "basket_sneaking",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    },
+    {
+      "id": "P4",
+      "pattern": "basket_sneaking",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    },
+    {
+      "id": "P5",
+      "pattern": "subscription_trap",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    },
+    {
+      "id": "P6",
+      "pattern": "confirm_shaming",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    },
+    {
+      "id": "P7",
+      "pattern": "interface_interference",
+      "supported": false,
+      "caught": null,
+      "runs": 3
+    },
+    {
+      "id": "P8",
+      "pattern": "drip_pricing",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    },
+    {
+      "id": "P9",
+      "pattern": "nagging",
+      "supported": true,
+      "caught": 3,
+      "runs": 3
+    }
+  ],
+  "caught": 18,
+  "possible": 24,
+  "catchRate": 75,
+  "averageSteps": 18.7,
+  "averageSeconds": 60.4,
+  "runs": [
+    {
+      "run": 1,
+      "seconds": 58.4,
+      "steps": 18,
+      "reachedPayment": true,
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "findings": [
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Platform fee — ₹19",
+          "detail": "\"Platform fee\" (₹19) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Handling fee — ₹29",
+          "detail": "\"Handling fee\" (₹29) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "product",
+          "evidence": "Cotton Crew Tee — ₹499",
+          "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Order Protection — ₹49",
+          "detail": "\"Order Protection\" came pre-selected, so the shopper has to spot it and opt out themselves.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Donation to Green India Fund — ₹10",
+          "detail": "\"Donation to Green India Fund\" (₹10) is in the order, but the shopper never added it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "subscription_trap",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "ChalakPlus 7-day free trial — ₹0",
+          "detail": "\"ChalakPlus 7-day free trial\" was pre-selected, so the shopper can end up on a recurring paid plan without actively choosing it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "nagging",
+          "severity": "medium",
+          "page": "home, product, cart, checkout, review",
+          "evidence": "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+          "detail": "The same popup interrupted the shopper on 5 pages (home, product, cart, checkout, review).",
+          "source": "rule"
+        },
+        {
+          "pattern": "confirm_shaming",
+          "severity": "medium",
+          "page": "cart",
+          "evidence": "No thanks, I don't mind if my order arrives broken",
+          "detail": "The decline option uses shaming language making the shopper feel careless about protecting their order.",
+          "source": "llm"
+        }
+      ],
+      "journeys": [
+        {
+          "reached_payment_page": true,
+          "stop_reason": "Reached payment step",
+          "items_added_by_agent": [],
+          "steps": [
+            {
+              "page": "home",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "product",
+              "total_shown": 499,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [
+                "⚡ Deal ends in 04:53",
+                "🔥 Only 3 left in stock!",
+                "👀 26 people are viewing this right now",
+                "⚡ Deal ends in 04:46",
+                "⚡ Deal ends in 04:43"
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "cart",
+              "total_shown": 558,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "preselected": [
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "urgency_texts": [
+                "Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now",
+                "Yes, protect my order",
+                "No thanks, I don't mind if my order arrives broken"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+                "🛡️ Wait! Protect your order? Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ]
+            },
+            {
+              "page": "checkout",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "review",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                },
+                {
+                  "label": "Platform fee",
+                  "amount": 19
+                },
+                {
+                  "label": "Handling fee",
+                  "amount": 29
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox. Join now Not now",
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "payment",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Amount payable",
+                  "amount": 606
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [],
+              "popups": []
+            }
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "run": 2,
+      "seconds": 64.1,
+      "steps": 20,
+      "reachedPayment": true,
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "findings": [
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Platform fee — ₹19",
+          "detail": "\"Platform fee\" (₹19) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Handling fee — ₹29",
+          "detail": "\"Handling fee\" (₹29) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "product",
+          "evidence": "Cotton Crew Tee — ₹499",
+          "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Order Protection — ₹49",
+          "detail": "\"Order Protection\" came pre-selected, so the shopper has to spot it and opt out themselves.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Donation to Green India Fund — ₹10",
+          "detail": "\"Donation to Green India Fund\" (₹10) is in the order, but the shopper never added it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "subscription_trap",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "ChalakPlus 7-day free trial — ₹0",
+          "detail": "\"ChalakPlus 7-day free trial\" was pre-selected, so the shopper can end up on a recurring paid plan without actively choosing it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "nagging",
+          "severity": "medium",
+          "page": "home, product, cart, checkout, review",
+          "evidence": "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+          "detail": "The same popup interrupted the shopper on 5 pages (home, product, cart, checkout, review).",
+          "source": "rule"
+        },
+        {
+          "pattern": "confirm_shaming",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "\"No thanks, I don't mind if my order arrives broken\"",
+          "detail": "The decline option is worded to shame the user by implying careless acceptance of a broken order.",
+          "source": "llm"
+        },
+        {
+          "pattern": "forced_action",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "\"Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.\" with preselected \"ChalakPlus 7-day free trial — ₹0\"",
+          "detail": "The free trial is preselected and may force users into a subscription if they don't actively opt-out at checkout.",
+          "source": "llm"
+        }
+      ],
+      "journeys": [
+        {
+          "reached_payment_page": true,
+          "stop_reason": "Reached payment step",
+          "items_added_by_agent": [],
+          "steps": [
+            {
+              "page": "home",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "product",
+              "total_shown": 499,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [
+                "⚡ Deal ends in 04:53",
+                "🔥 Only 5 left in stock!",
+                "👀 13 people are viewing this right now",
+                "⚡ Deal ends in 04:47",
+                "⚡ Deal ends in 04:43",
+                "⚡ Deal ends in 04:41"
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now",
+                "Yes, join the Chalak Club"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+                "Join the Chalak Club for exclusive deals and rewards!"
+              ]
+            },
+            {
+              "page": "cart",
+              "total_shown": 558,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "preselected": [
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "urgency_texts": [
+                "Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now",
+                "Yes, start my free trial",
+                "No thanks",
+                "Yes, protect my order",
+                "No thanks, I don't mind if my order arrives broken"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+                "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.",
+                "🛡️ Wait! Protect your order? Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ]
+            },
+            {
+              "page": "checkout",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "review",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                },
+                {
+                  "label": "Platform fee",
+                  "amount": 19
+                },
+                {
+                  "label": "Handling fee",
+                  "amount": 29
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "payment",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Amount payable",
+                  "amount": 606
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [],
+              "popups": []
+            }
+          ]
+        }
+      ],
+      "error": null
+    },
+    {
+      "run": 3,
+      "seconds": 58.8,
+      "steps": 18,
+      "reachedPayment": true,
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "findings": [
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Platform fee — ₹19",
+          "detail": "\"Platform fee\" (₹19) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "drip_pricing",
+          "severity": "high",
+          "page": "review",
+          "evidence": "Handling fee — ₹29",
+          "detail": "\"Handling fee\" (₹29) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Order Protection — ₹49",
+          "detail": "\"Order Protection\" came pre-selected, so the shopper has to spot it and opt out themselves.",
+          "source": "rule"
+        },
+        {
+          "pattern": "basket_sneaking",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "Donation to Green India Fund — ₹10",
+          "detail": "\"Donation to Green India Fund\" (₹10) is in the order, but the shopper never added it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "subscription_trap",
+          "severity": "high",
+          "page": "cart",
+          "evidence": "ChalakPlus 7-day free trial — ₹0",
+          "detail": "\"ChalakPlus 7-day free trial\" was pre-selected, so the shopper can end up on a recurring paid plan without actively choosing it.",
+          "source": "rule"
+        },
+        {
+          "pattern": "nagging",
+          "severity": "medium",
+          "page": "home, product, cart, checkout, review",
+          "evidence": "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+          "detail": "The same popup interrupted the shopper on 5 pages (home, product, cart, checkout, review).",
+          "source": "rule"
+        },
+        {
+          "pattern": "confirm_shaming",
+          "severity": "medium",
+          "page": "cart",
+          "evidence": "\"No thanks, I don't mind if my order arrives broken\"",
+          "detail": "The decline option is worded to make the shopper feel careless about their order arriving broken, using guilt to push the choice.",
+          "source": "llm"
+        }
+      ],
+      "journeys": [
+        {
+          "reached_payment_page": true,
+          "stop_reason": "Reached payment step",
+          "items_added_by_agent": [
+            "Cotton Crew Tee"
+          ],
+          "steps": [
+            {
+              "page": "home",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "product",
+              "total_shown": 499,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [
+                "⚡ Deal ends in 04:53",
+                "🔥 Only 3 left in stock!",
+                "👀 22 people are viewing this right now",
+                "⚡ Deal ends in 04:47",
+                "⚡ Deal ends in 04:43"
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "cart",
+              "total_shown": 558,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "preselected": [
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                }
+              ],
+              "urgency_texts": [
+                "Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ],
+              "choice_texts": [
+                "Join now",
+                "Not now",
+                "Yes, protect my order",
+                "No thanks, I don't mind if my order arrives broken"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+                "🛡️ Wait! Protect your order? Add Damage Shield for just ₹39 and get a free replacement if anything arrives broken."
+              ]
+            },
+            {
+              "page": "checkout",
+              "total_shown": null,
+              "line_items": [],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "review",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Cotton Crew Tee",
+                  "amount": 499
+                },
+                {
+                  "label": "Donation to Green India Fund",
+                  "amount": 10
+                },
+                {
+                  "label": "Order Protection",
+                  "amount": 49
+                },
+                {
+                  "label": "ChalakPlus 7-day free trial",
+                  "amount": 0
+                },
+                {
+                  "label": "Platform fee",
+                  "amount": 19
+                },
+                {
+                  "label": "Handling fee",
+                  "amount": 29
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [
+                "Join now",
+                "Not now"
+              ],
+              "popups": [
+                "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox."
+              ]
+            },
+            {
+              "page": "payment",
+              "total_shown": 606,
+              "line_items": [
+                {
+                  "label": "Amount payable",
+                  "amount": 606
+                }
+              ],
+              "preselected": [],
+              "urgency_texts": [],
+              "choice_texts": [],
+              "popups": []
+            }
+          ]
+        }
+      ],
+      "error": null
+    }
+  ]
+}
