@@ -59,7 +59,7 @@ For a new project, run these in order in the Supabase SQL editor:
 3. [0003_agent_steps.sql](supabase/migrations/0003_agent_steps.sql) — `run_steps` and the public `screens` Storage bucket.
 4. [0004_codex_fix.sql](supabase/migrations/0004_codex_fix.sql) — fix status, branch/PR, Codex summary and re-audit link.
 
-The checked project already has migrations 0001/0002. **0003 and 0004 remain to be applied.** The service-role REST key does not provide a SQL execution endpoint. After applying the SQL, restart the application and run a fresh audit; missing historical screenshots cannot be recovered.
+The checked project has all four migrations applied. Real UI checks verified persisted steps, public screenshots, fix metadata and receipts. For a new Supabase project, apply all four files above before starting audits. Missing historical screenshots cannot be recovered.
 
 In separate terminals:
 
@@ -98,36 +98,38 @@ codex login
 npx serve ../chalak-mart -l 5051
 ```
 
-Optionally authenticate `gh` and create a public demo-store repository with an `origin` remote to enable PRs. Without GitHub authentication/origin, the fix stays in a local branch and the receipt shows its name and diff summary.
+Fixes stay local by default. To publish PRs, explicitly set `FIX_PUBLISH_PR=true`, authenticate `gh`, and configure the store's GitHub `origin`. With publishing disabled or GitHub unavailable, the receipt shows the local branch and diff summary.
 
 Set `FIX_REPO_PATH` to the **absolute** path of that clone, and `FIX_STORE_URL=http://localhost:5051/index.html` in `apps/api/.env`; restart the API/worker. Apply migration 0004 before requesting fixes.
 
-Audit that exact URL, wait for the report, then click **Fix with Codex**. The API claims one fix and queues it. The worker creates `jhol-fix-…` from main, passes captured findings through stdin, commits only `index.html`, opens a PR when possible, and queues a fresh one-session audit while serving the changed branch. Success requires a higher score and a lower final price. Receipts show both results. The worker restores main afterward; the fix remains on its branch and the PR is not merged.
+Audit that exact URL, wait for the report, then click **Fix with Codex**. The API claims one fix and queues it. The worker creates `jhol-fix-…` from main, passes captured findings through stdin, commits only `index.html`, optionally publishes a PR, and queues a fresh one-session audit while serving the changed branch. Success requires a higher score and a lower final price. Receipts show both results. The worker restores main afterward; the fix remains on its branch and any PR is not merged. A fix left rechecking after a lost worker lease can recover from its saved completed re-audit.
 
 Codex has a ten-minute deadline and uses `--sandbox workspace-write` / `approval_policy="never"`, replacing the removed `--full-auto` flag in the installed CLI; see [official non-interactive mode documentation](https://learn.chatgpt.com/docs/non-interactive-mode). Subprocesses use argument arrays, receive no application secrets, and have bounded output and timeouts. A repository lock prevents overlapping edits. Dirty failed edits are preserved for review rather than discarded.
 
-The real Codex demo check opened [PR #1](https://github.com/Shivanshu49/chalak-mart/pull/1) on branch `jhol-fix-a69ba9ac-mvxj0g9q`. Its fresh audit improved **score 0 → 63** and **price ₹606 → ₹499**, then restored `main`. [Recorded result](evals/fix-check-2026-11-01.json). Fix state and re-audit storage in that check were in-memory; the after-audit ID is not a persistent Supabase report.
+Real UI/Supabase checks now verify the complete local fix flow: the actual report button ran Codex, saved a fix branch and `fixed_audit_id`, and displayed persisted before/after receipts after reload. The original-store check saved all **39 steps and screenshots**. [Verification records](evals/verification/README.md).
 
-The Supabase-backed fix check is **WIP until migration 0004 is applied**. This opt-in check uses an in-memory database with real Redis DB 14, agent, judge, Codex CLI and git/GitHub; it does not verify Supabase persistence:
+The existing [PR #1](https://github.com/Shivanshu49/chalak-mart/pull/1) was verified without a new push. Its exact published code now audits at **100/100 and ₹499, with no findings**, after correcting three Jhol extraction false positives: the shopper's own tee and two unchecked offers. The store code was unchanged for that control. The historical score-63 check retained only a summary; its exact after-findings are unavailable. The recovered PR receipt links to the fresh persisted audit. [Diagnosis and proof](evals/verification/FIX_DIAGNOSIS.md). The store was restored to clean `main`.
+
+To repeat real browser and Supabase checks with `pnpm dev` running and publishing disabled:
 
 ```bash
-node --env-file-if-exists=apps/api/.env apps/api/test/live-fix.cjs
+node --env-file-if-exists=apps/api/.env apps/api/test/live-ui.cjs
+UI_TARGET_URL=http://localhost:5051/index.html UI_TWICE=false UI_TRIGGER_FIX=true \
+  node --env-file-if-exists=apps/api/.env apps/api/test/live-ui.cjs
 ```
 
 ## Measured evals — 1 November 2026
 
 ```bash
-pnpm --filter @jhol/core eval --runs 3
-# Include timer/stock comparisons:
-SESSION_B_DELAY_MS=60000 pnpm --filter @jhol/core eval --runs 3 --twice
+pnpm --filter @jhol/core eval --runs 3 --twice
 ```
 
-The measured command used three **single-session** audits of the original Chalak Mart, with an OpenAI shopper and OpenAI judge:
+The measured command used three **two-session** audits (six visits) of the original Chalak Mart, with the OpenAI `gpt-4.1-mini` shopper and OpenAI judge. Visit B started 120 seconds after A. All six visits reached payment at ₹499 → ₹606. The first completed three pairs are reported without resampling:
 
 | Case | Planted behavior | Caught |
 | --- | --- | --- |
-| P1 | Restarting countdown | 0/3 — needs `--twice` |
-| P2 | Changing stock claim | 0/3 — needs `--twice` |
+| P1 | Restarting countdown | 3/3 |
+| P2 | Changing stock claim | 2/3 |
 | P3 | Auto-added donation | 3/3 |
 | P4 | Preselected protection | 3/3 |
 | P5 | Preselected subscription trial | 3/3 |
@@ -136,7 +138,9 @@ The measured command used three **single-session** audits of the original Chalak
 | P8 | Both hidden fees | 3/3 |
 | P9 | Repeated newsletter popup | 3/3 |
 
-**18/24 supported case-runs: 75% coverage. Average 18.7 steps and 60.4 seconds per audit.** All reached payment. Vision is excluded from the denominator; the two urgency cases remain included. This measures captured planted cases, not false-positive precision. [Raw eval results](evals/results-2026-11-01T07-52-40-904Z.json) include each journey and finding.
+**23/24 supported case-runs: 95.8% coverage. Average 37.7 steps and 188.6 seconds per two-session audit**, including the wait between visits. Vision is excluded from the denominator. [Raw eval results](evals/results-2026-11-01T10-03-27-498Z.json) include all six journeys and findings.
+
+Stock pairs were 3 → 3 (no finding), 5 → 2 (a low-severity change warning that could indicate real sales), and 4 → 5 (high-severity stock increase). The equal random draw explains the uncaught stock case. These numbers measure planted-case coverage, not precision: run 2 also produced an extra false-positive basket-sneaking finding for the shopper's own tee when the model omitted its added-item evidence. That limitation remains recorded rather than hidden by a rerun.
 
 The separate Step-A check passed three times at ₹499 → ₹606, with exactly drip pricing ×2, basket sneaking ×2, subscription trap ×1 and nagging ×1. OpenAI totals were **54.5s, 80.3s and 65.8s**. Its two-session check reached payment twice and added false urgency ×2 in **144.6s**. [Agent check results](evals/agent-checks-2026-11-01.json).
 
@@ -154,9 +158,9 @@ Core tests cover detectors, payment safety, netguard and eval accounting. API e2
 
 - `packages/core` — agent, snapshot, netguard, journey contract, detectors, shared judge, Exa and eval CLI.
 - `apps/api` — NestJS API/BullMQ worker, evidence storage and Codex Fix.
-- `apps/web` — Next.js dashboard and server-side proxies. The report redesign stays with the frontend teammate; this change only adds Fix controls and receipts.
+- `apps/web` — Next.js dashboard, server-side proxies, saved evidence viewer and Codex receipts. The report redesign stays with the frontend teammate.
 - `supabase/migrations` — numbered database/Storage changes.
 - `apps/web/public/lab` — original fictional store and planted ground truth.
 - `evals` — recorded CLI, worker and evaluation results.
 
-[NOTES.md](NOTES.md) records passed checks, remaining SQL work, and the distinction between live and in-memory checks. Jhol commits remain local.
+[NOTES.md](NOTES.md) records verification history and distinguishes live Supabase checks from stubbed tests. Development work is on `devday`.

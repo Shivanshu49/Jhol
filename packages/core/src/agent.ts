@@ -292,6 +292,7 @@ export function addedItemForAction(snap: Snapshot, data: PageData, action: Agent
   if (action.type !== "click") return null;
   if (modelName?.trim()) return modelName;
   const target = snap.elements.find((e) => e.id === action.target);
+  // shortcut: requires a product in this reply; use DOM-linked evidence if the model omits both product fields.
   const products = data.line_items.filter((li) => (li.amount ?? 0) > 0);
   return target && /\badd\b.*\b(?:cart|bag|basket)\b/i.test(target.text) && products.length === 1 ? products[0].label : null;
 }

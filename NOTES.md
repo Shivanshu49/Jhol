@@ -1,5 +1,13 @@
 # DevDay checks — 2026-11-01
 
+## Latest: publication, CI and two-session eval
+
+The user subsequently authorized pushing Jhol to GitHub. Verified code is published on `devday`; earlier "no push" statements below describe their respective checks. The separate store remains on clean main, with no new store push in these follow-up checks.
+
+CI commit `e5a346b` adds `playwright install --with-deps chromium` directly after the build. GitHub Actions run `41295688297` passed the build, Chromium installation, all 18 core tests and all 11 API e2e tests, including the previously unreached API step.
+
+Completed `pnpm --filter @jhol/core eval --runs 3 --twice` once, with the standard 120,000ms session-start gap: 23/24 supported case-runs (95.8%), average 37.7 steps and 188.6s per pair, all six visits reached payment at ₹499 → ₹606. Countdown, donation, protection, subscription, confirm shaming, both fees and nagging were 3/3; stock was 2/3; visual interference remains unsupported. Stock samples: 3 → 3, 5 → 2 (low-confidence change warning), 4 → 5. Run 2 also flagged the shopper's tee incorrectly because its added-item evidence was missing. No resampling or precision claim: the limitation is retained in the README and raw JSON. Results: `evals/results-2026-11-01T10-03-27-498Z.json`.
+
 ## Follow-up: real Supabase and UI verification
 
 Migrations 0003 and 0004 are now applied. The earlier migration-related WIP entries below describe the initial checks, before the SQL was applied.
