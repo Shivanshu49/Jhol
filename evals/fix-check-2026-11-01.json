@@ -1,0 +1,18 @@
+{
+  "mode": "in-memory database; real agent/Codex/Redis/git/GitHub",
+  "auditId": "a69ba9ac-5a83-49a0-8b8e-4db4ba5c9306",
+  "before": {
+    "score": 0,
+    "price_final": 606
+  },
+  "after": {
+    "id": "f314b517-b34a-4deb-b9c2-410f23b750cd",
+    "status": "done",
+    "score": 63,
+    "price_final": 499
+  },
+  "branch": "jhol-fix-a69ba9ac-mvxj0g9q",
+  "pr": "https://github.com/Shivanshu49/chalak-mart/pull/1",
+  "diff": "index.html | 109 +++++++++++++++++++------------------------------------------\n 1 file changed, 34 insertions(+), 75 deletions(-)",
+  "restoredBranch": "main"
+}

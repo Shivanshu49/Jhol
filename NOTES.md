@@ -33,3 +33,13 @@ Ran `pnpm --filter @jhol/core eval --runs 3` against the original port-5050 stor
 ## E — Skipped by the requested condition
 
 CEREBRAS_API_KEY is empty or absent in apps/api/.env. No Cerebras request was made and no provider comparison is claimed. Provider selection, the --llm flag, gpt-oss-120b at https://api.cerebras.ai/v1, the compact snapshot and json_object fallback are already implemented. Measured OpenAI Step-A totals: 54.5s, 80.3s and 65.8s (two-session total: 144.6s). Cerebras total: not measured.
+
+### C — Real Codex/GitHub result
+
+The opt-in check passed with real Codex, git/GitHub, Redis, agent and judge. PR: https://github.com/Shivanshu49/chalak-mart/pull/1. Branch: `jhol-fix-a69ba9ac-mvxj0g9q`. Before: ₹606, score 0. After: ₹499, score 63. The repo was restored to main and the PR was not merged. `evals/fix-check-2026-11-01.json` records the result. Fix state and after-audit storage were in-memory, so the after-audit UUID is not available in the persistent dashboard. Cloud persistence is still WIP until migrations 0003/0004 are applied.
+
+## F — Passed
+
+README now covers the Playwright agent, Cerebras/OpenAI selection, shared OpenAI judge, Exa, netguard, Codex Fix, measured eval table, provider timing limits, all four SQL migrations and local commands. Documentation checks verified local links, migration paths and agreement with recorded eval numbers. The final required build, core and API checks are recorded below. Next.js generated apps/web/AGENTS.md during development; its documentation guidance was read and retained.
+
+Final required checks: pnpm turbo run build passed; core tests 15/15; API e2e tests 10/10. The tracked-file secret scan and git diff --check passed. No Jhol push was performed. The demo PR is open, main is restored, and the store repository is clean. pnpm dev is running on web :3000 / API+worker :4000; the original test store remains on :5050 and the separate store is served on :5051.
