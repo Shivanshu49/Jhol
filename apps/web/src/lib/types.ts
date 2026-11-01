@@ -10,6 +10,8 @@ export type Finding = {
   source: "rule" | "llm";
 };
 
+export type AuditStep = { idx: number; page: string; action: string; reason: string | null; total_shown: number | null; screenshot_url: string | null };
+
 export type Run = {
   id: string;
   session: "A" | "B";
@@ -22,6 +24,7 @@ export type Run = {
   reached_payment_page: boolean | null;
   stop_reason: string | null;
   pages: string[];
+  steps: AuditStep[];
 };
 
 export type Audit = {

@@ -1,0 +1,194 @@
+{
+  "target": "http://localhost:5051/index.html",
+  "twice": false,
+  "triggerFix": false,
+  "createdThroughUI": true,
+  "resumedAudit": null,
+  "stubbed": false,
+  "publishing": false,
+  "auditId": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+  "before": {
+    "audit": {
+      "id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+      "url": "http://localhost:5051/index.html",
+      "journey": "checkout",
+      "sessions": 1,
+      "options": {},
+      "status": "done",
+      "error": null,
+      "price_shown": 499,
+      "price_final": 499,
+      "score": 55,
+      "report_hash": "5f174ba1244f670871c89464b9572c63f14446eb7dc446fde5fe381cc9f8b7bc",
+      "created_at": "2026-11-01T09:37:36.804131+00:00",
+      "finished_at": "2026-11-01T09:38:15.664+00:00",
+      "fix_status": null,
+      "fix_pr_url": null,
+      "fix_branch": null,
+      "fixed_audit_id": null,
+      "fix_error": null,
+      "fix_message": null,
+      "fix_diff_summary": null
+    },
+    "runs": [
+      {
+        "id": "e93d30cd-4cc6-49ed-9dee-512295a35da9",
+        "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+        "session": "A",
+        "tinyfish_run_id": null,
+        "status": "COMPLETED",
+        "streaming_url": null,
+        "video_url": null,
+        "started_at": "2026-11-01T09:37:37.082+00:00",
+        "num_steps": 11,
+        "error": null,
+        "created_at": "2026-11-01T09:37:37.144687+00:00",
+        "reached_payment_page": true,
+        "stop_reason": "Reached payment step",
+        "pages": [
+          "home",
+          "product",
+          "cart",
+          "checkout",
+          "review",
+          "payment"
+        ],
+        "steps": [
+          {
+            "idx": 1,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View the cheapest in-stock product: Cotton Crew Tee priced at ₹499 · Action failed: That element is covered by a popup or overlay. Decline/close the popup first.",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/1.jpg"
+          },
+          {
+            "idx": 2,
+            "page": "home",
+            "action": "click \"Not now\"",
+            "reason": "Close the newsletter popup that is blocking the page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/2.jpg"
+          },
+          {
+            "idx": 3,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View cheapest product Cotton Crew Tee to add it to cart",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/3.jpg"
+          },
+          {
+            "idx": 4,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add one unit of the cheapest product to cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/4.jpg"
+          },
+          {
+            "idx": 5,
+            "page": "cart",
+            "action": "click \"Proceed to checkout\"",
+            "reason": "Proceed to checkout from cart",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/5.jpg"
+          },
+          {
+            "idx": 6,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "Fill full name in checkout form",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/6.jpg"
+          },
+          {
+            "idx": 7,
+            "page": "checkout",
+            "action": "fill = \"test@example.com\"",
+            "reason": "Fill email in checkout form",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/7.jpg"
+          },
+          {
+            "idx": 8,
+            "page": "checkout",
+            "action": "fill = \"110001\"",
+            "reason": "Fill pincode in checkout form",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/8.jpg"
+          },
+          {
+            "idx": 9,
+            "page": "checkout",
+            "action": "click \"Continue to review\"",
+            "reason": "Proceed to review order page after filling guest details",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/9.jpg"
+          },
+          {
+            "idx": 10,
+            "page": "review",
+            "action": "click \"Continue to payment\"",
+            "reason": "Proceed to payment step",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/10.jpg"
+          },
+          {
+            "idx": 11,
+            "page": "payment",
+            "action": "stop",
+            "reason": "Payment options visible; never submit an order or payment.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/b8eab4e7-a75b-4ab2-9b42-540744e25dfe/A/11.jpg"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "920547b9-76c9-4c09-8b1f-4d96c25b6100",
+        "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "product",
+        "evidence": "Cotton Crew Tee — ₹499",
+        "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:38:15.620081+00:00"
+      },
+      {
+        "id": "df34d19f-5c70-46de-b54c-332d4319d064",
+        "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Order Protection (₹49): covers loss in transit — ₹49",
+        "detail": "\"Order Protection (₹49): covers loss in transit\" (₹49) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:38:15.620081+00:00"
+      },
+      {
+        "id": "42338d47-8739-485c-8f42-51c5d065e2c5",
+        "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+        "pattern": "subscription_trap",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled. — ₹0",
+        "detail": "\"Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.\" is in the order although the shopper never chose a subscription.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:38:15.620081+00:00"
+      }
+    ],
+    "precedents": {},
+    "fix_available": true,
+    "fix_after": null
+  },
+  "beforeEvidence": {
+    "rows": 11,
+    "screenshots": 11,
+    "jpegBytes": 284345
+  },
+  "evidenceShownAfterReload": true,
+  "browserErrors": []
+}

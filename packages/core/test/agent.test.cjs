@@ -97,6 +97,20 @@ test("validates model replies against the decision schema", () => {
   assert.match(decisionError([]), /reply must be object/);
 });
 
+test("model replies remain storable in PostgreSQL without corrupting valid Unicode", () => {
+  const { parseDecision } = require("../dist/index.js");
+  const reply = {
+    page: "cart",
+    page_data: { total_shown: 499, line_items: [{ label: "Cotton 👕 ₹499", amount: 499 }], urgency_texts: [], choice_texts: [], popups: ["Literal \\u0000 stays literal"] },
+    product_added: null,
+    action: { type: "click", target: "e1", value: null, reason: "Continue\u0000\uD800" },
+  };
+  const got = parseDecision(JSON.stringify(reply));
+  assert.equal(got.action.reason, "Continue\uFFFD\uFFFD");
+  assert.deepEqual(got.page_data, reply.page_data);
+  assert.throws(() => parseDecision(JSON.stringify({ ...reply, page: 42 })), /reply.page must be string/);
+});
+
 test("precedents: trusted domains first, topped up from news, http(s) only, cached", async () => {
   const { findPrecedents, precedentQuery } = require("../dist/index.js");
   const r = (url, title, publishedDate) => ({ id: url, url, title, publishedDate, highlights: [`  CCPA   fined ${title} `] });

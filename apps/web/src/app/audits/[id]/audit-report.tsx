@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CodexFix, FIX_ACTIVE } from "@/components/codex-fix";
+import { AuditSteps } from "@/components/audit-steps";
 import { PATTERNS, rupees, type AuditView, type Finding, type Precedent, type Run } from "@/lib/types";
 
 const ACTIVE = new Set(["running", "finalizing"]);
@@ -107,6 +108,7 @@ export function AuditReport({ id }: { id: string }) {
         </section>
       )}
 
+      <AuditSteps runs={runs} />
       {audit.status === "done" && <Report view={view} findings={findings} />}
       {audit.status === "done" && <CodexFix view={view} onQueued={() => setRefreshKey((n) => n + 1)} />}
     </div>

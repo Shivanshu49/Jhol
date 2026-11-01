@@ -139,6 +139,15 @@ export function decisionError(v: unknown, s: Schema = DECISION_SCHEMA, path = "r
   return null;
 }
 
+/** Model JSON can contain NUL or lone surrogates, which PostgreSQL jsonb cannot store. */
+export function parseDecision(content: string): Decision {
+  const parsed: unknown = JSON.parse(content, (_key, value: unknown) => typeof value === "string"
+    ? Buffer.from(value, "utf8").toString("utf8").replace(/\u0000/g, "\uFFFD") : value);
+  const error = decisionError(parsed);
+  if (error) throw new Error(error);
+  return parsed as Decision;
+}
+
 type Llm = { provider: LlmProvider; model: string; client: OpenAI; jsonSchema: boolean };
 
 function llmFor(choice: string): Llm {
@@ -187,15 +196,12 @@ async function decide(llm: Llm, system: string, user: string): Promise<Decision>
   ];
   for (let attempt = 1; ; attempt++) {
     const content = await complete(llm, messages);
-    let parsed: unknown;
     let err: string | null;
     try {
-      parsed = JSON.parse(content);
-      err = decisionError(parsed);
+      return parseDecision(content);
     } catch (e) {
-      err = `not valid JSON (${(e as Error).message})`;
+      err = (e as Error).message;
     }
-    if (!err) return parsed as Decision;
     if (attempt === 2) throw new Error(`invalid reply after retry: ${err}`);
     messages.push({ role: "assistant", content }, { role: "user", content: `Your reply was invalid: ${err}. Reply again with only the corrected JSON object.` });
   }

@@ -58,7 +58,8 @@ Captured findings:\n${JSON.stringify(findings.map(({ pattern, page, evidence, de
       await git("commit", "-m", "Remove checkout dark patterns found by Jhol");
       await this.db.updateFix(auditId, { fix_message: message, fix_diff_summary: diff });
 
-      const origin = await git("remote", "get-url", "origin").catch(() => "");
+      const publish = this.config.get<string>("FIX_PUBLISH_PR") === "true";
+      const origin = publish ? await git("remote", "get-url", "origin").catch(() => "") : "";
       const github = origin && /^(?:https:\/\/github\.com\/|git@github\.com:)[\w.-]+\/[\w.-]+(?:\.git)?$/.test(origin)
         && await runCommand("gh", ["auth", "status"], repo).then(() => true, () => false);
       if (github) {

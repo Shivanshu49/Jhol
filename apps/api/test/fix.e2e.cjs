@@ -9,6 +9,7 @@ const { MemoryDb } = require("./memory-db.cjs");
 
 test("Codex Fix commits an isolated branch, re-audits, saves receipts and restores main without GitHub", async () => {
   const repo = await fs.mkdtemp(path.join(os.tmpdir(), "jhol-fix-test-"));
+  const remote = await fs.mkdtemp(path.join(os.tmpdir(), "jhol-no-push-test-"));
   const git = (...args) => runCommand("git", args, repo);
   try {
     await git("init", "-b", "main");
@@ -17,6 +18,9 @@ test("Codex Fix commits an isolated branch, re-audits, saves receipts and restor
     await fs.writeFile(path.join(repo, "index.html"), "<h1>Tee ₹499</h1><p>Hidden donation ₹10</p>");
     await git("add", "--", "index.html");
     await git("commit", "-m", "Fixture");
+    await git("init", "--bare", remote);
+    await git("remote", "add", "origin", "https://github.com/example/jhol-no-push-test.git");
+    await git("remote", "set-url", "--push", "origin", remote);
     const db = new MemoryDb();
     const before = await db.createAudit({ url: "http://localhost:5051/index.html", sessions: 1, options: {} });
     await db.finishAudit(before.id, { status: "done", fix_status: "queued", score: 25, price_final: 606 });
@@ -31,7 +35,7 @@ test("Codex Fix commits an isolated branch, re-audits, saves receipts and restor
       await db.finishAudit(after.id, { status: "done", score: 100, price_final: 499 });
       return after;
     } };
-    const config = { getOrThrow: (key) => key === "FIX_REPO_PATH" ? repo : before.url };
+    const config = { getOrThrow: (key) => key === "FIX_REPO_PATH" ? repo : before.url, get: () => "false" };
     const codex = async (cwd, prompt) => {
       assert.match(prompt, /Hidden donation/);
       await fs.writeFile(path.join(cwd, "index.html"), "<h1>Tee ₹499</h1>");
@@ -51,7 +55,8 @@ test("Codex Fix commits an isolated branch, re-audits, saves receipts and restor
     assert.match(await fs.readFile(path.join(repo, "index.html"), "utf8"), /donation/);
     assert.deepEqual(states, ["fixing", "rechecking", "done"]);
     await assert.rejects(fs.access(path.join(repo, ".git", "jhol-fix.lock")));
-  } finally { await fs.rm(repo, { recursive: true, force: true }); }
+    assert.equal(await runCommand("git", ["--git-dir", remote, "for-each-ref", "--format=%(refname)"], repo), "", "publishing disabled: no remote refs created");
+  } finally { await fs.rm(repo, { recursive: true, force: true }); await fs.rm(remote, { recursive: true, force: true }); }
 });
 
 test("command runner enforces its timeout and does not forward application secrets", async () => {

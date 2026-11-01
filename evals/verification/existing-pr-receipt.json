@@ -1,0 +1,193 @@
+{
+  "mode": "Recovery of prior in-memory PR metadata using a fresh real UI/Supabase re-audit, not a new publication",
+  "published": {
+    "headRefName": "jhol-fix-a69ba9ac-mvxj0g9q",
+    "headRefOid": "e55f4a9b08197b44b3556bb950ac7297f30ed567",
+    "state": "OPEN",
+    "url": "https://github.com/Shivanshu49/chalak-mart/pull/1"
+  },
+  "beforeId": "a69ba9ac-5a83-49a0-8b8e-4db4ba5c9306",
+  "afterId": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+  "after": {
+    "id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+    "url": "http://localhost:5051/index.html",
+    "journey": "checkout",
+    "sessions": 1,
+    "options": {},
+    "status": "done",
+    "error": null,
+    "price_shown": 499,
+    "price_final": 499,
+    "score": 55,
+    "report_hash": "5f174ba1244f670871c89464b9572c63f14446eb7dc446fde5fe381cc9f8b7bc",
+    "created_at": "2026-11-01T09:37:36.804131+00:00",
+    "finished_at": "2026-11-01T09:38:15.664+00:00",
+    "precedents": {},
+    "fix_status": null,
+    "fix_pr_url": null,
+    "fix_branch": null,
+    "fixed_audit_id": null,
+    "fix_error": null,
+    "fix_message": null,
+    "fix_diff_summary": null
+  },
+  "findings": [
+    {
+      "id": "920547b9-76c9-4c09-8b1f-4d96c25b6100",
+      "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+      "pattern": "basket_sneaking",
+      "severity": "high",
+      "page": "product",
+      "evidence": "Cotton Crew Tee — ₹499",
+      "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+      "source": "rule",
+      "created_at": "2026-11-01T09:38:15.620081+00:00"
+    },
+    {
+      "id": "df34d19f-5c70-46de-b54c-332d4319d064",
+      "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+      "pattern": "basket_sneaking",
+      "severity": "high",
+      "page": "cart",
+      "evidence": "Order Protection (₹49): covers loss in transit — ₹49",
+      "detail": "\"Order Protection (₹49): covers loss in transit\" (₹49) is in the order, but the shopper never added it.",
+      "source": "rule",
+      "created_at": "2026-11-01T09:38:15.620081+00:00"
+    },
+    {
+      "id": "42338d47-8739-485c-8f42-51c5d065e2c5",
+      "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+      "pattern": "subscription_trap",
+      "severity": "high",
+      "page": "cart",
+      "evidence": "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled. — ₹0",
+      "detail": "\"Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.\" is in the order although the shopper never chose a subscription.",
+      "source": "rule",
+      "created_at": "2026-11-01T09:38:15.620081+00:00"
+    }
+  ],
+  "runs": [
+    {
+      "id": "e93d30cd-4cc6-49ed-9dee-512295a35da9",
+      "audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+      "session": "A",
+      "tinyfish_run_id": null,
+      "status": "COMPLETED",
+      "streaming_url": null,
+      "video_url": null,
+      "started_at": "2026-11-01T09:37:37.082+00:00",
+      "num_steps": 11,
+      "result": {
+        "steps": [
+          {
+            "page": "home",
+            "popups": [
+              "Join our newsletter for exclusive deals!"
+            ],
+            "line_items": [],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [],
+            "urgency_texts": [
+              "Get 10% off your first order!"
+            ]
+          },
+          {
+            "page": "product",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "cart",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Order Protection (₹49): covers loss in transit",
+                "amount": 49
+              },
+              {
+                "label": "Start ChalakPlus 7-day free trial: ₹0 today Renews at ₹199/month after 7 days unless cancelled.",
+                "amount": 0
+              }
+            ],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "checkout",
+            "popups": [],
+            "line_items": [],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "review",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Delivery",
+                "amount": 0
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "payment",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Amount payable",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          }
+        ],
+        "stop_reason": "Reached payment step",
+        "items_added_by_agent": [],
+        "reached_payment_page": true
+      },
+      "error": null,
+      "created_at": "2026-11-01T09:37:37.144687+00:00"
+    }
+  ],
+  "oldAfterPresent": false,
+  "recovery": {
+    "fix_status": "done",
+    "fix_pr_url": "https://github.com/Shivanshu49/chalak-mart/pull/1",
+    "fix_branch": "jhol-fix-a69ba9ac-mvxj0g9q",
+    "fixed_audit_id": "b8eab4e7-a75b-4ab2-9b42-540744e25dfe",
+    "fix_error": null,
+    "fix_message": "Recovered the existing PR #1 receipt after migrations 0003/0004. Linked a fresh real UI audit of the exact published commit; no new Codex run or push was performed for this recovery.",
+    "fix_diff_summary": "index.html | 109 +++++++++++++++++++------------------------------------------\n 1 file changed, 34 insertions(+), 75 deletions(-)"
+  },
+  "pushed": false,
+  "prAndReceiptsShownAfterReload": true
+}

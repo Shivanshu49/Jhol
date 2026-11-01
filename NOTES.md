@@ -1,5 +1,23 @@
 # DevDay checks — 2026-11-01
 
+## Follow-up: real Supabase and UI verification
+
+Migrations 0003 and 0004 are now applied. The earlier migration-related WIP entries below describe the initial checks, before the SQL was applied.
+
+The new two-session audit `3489e4f9-5f98-41a3-8c39-978e58a8d883` was created with the actual landing-page form while `pnpm dev` was running. Both visits reached payment; price was ₹499 → ₹606. Findings: drip pricing ×2, basket sneaking ×2, subscription trap ×1, false urgency ×2, nagging ×1, confirm shaming ×1. All 39 `run_steps` rows have screenshots; all 39 public JPEG downloads passed. The evidence viewer displayed the saved screenshots after reloading, and selecting a recorded step changed the displayed screenshot. Browser requests went through the Next.js proxy. No browser errors were recorded. Raw proof: `evals/verification/ui-2026-11-01T08-30-39-980Z.json` and the corresponding evidence PNG.
+
+Automatic publication now requires `FIX_PUBLISH_PR=true`; it defaults to false. This session uses false to honor the instruction never to push. The fix integration test uses a GitHub-shaped fetch origin and a temporary bare push destination and verifies that no remote refs are created. A new fix can still commit its branch, persist its re-audit and display before/after receipts locally.
+
+Required checks after the evidence viewer and publishing guard: build passed, core tests 15/15, API e2e tests 10/10. The first browser setup attempt timed out on Next.js development traffic before submitting an audit; the harness now waits for page content instead of network idle.
+
+The first port-5051 baseline audit, `23c3f131-e57f-46ed-bf68-587c3449011f`, failed on saving its journey with PostgreSQL's `unsupported Unicode escape sequence`. It never started FIX. Model replies now replace NUL and invalid surrogate characters before validation and use, preserving valid rupee/emoji text and literal escaped strings. A regression test covers those cases. The failed attempt is retained in the verification records instead of being counted as a successful audit.
+
+The retry `383af613-ba90-42bb-aa46-6af932802a78` was created through the landing page, and FIX was triggered with the actual report button. Real Codex committed `e4f6cd2` on local branch `jhol-fix-383af613-mvxl26je`. Supabase saved `fixed_audit_id=0d1a31a8-5b8f-432c-973d-039a31544a1e`: score 3 → 55, price ₹606 → ₹499, payment reached. There are 17 baseline screenshots and 13 re-audit screenshots, all downloadable. No new PR was published.
+
+There was a long host-clock gap during this run and BullMQ logged lost Redis leases for FIX and START_SESSION. The UI harness timed out; the re-audit nevertheless persisted. GET now conditionally recovers a fix left `rechecking` from its completed linked audit, using the same score/price requirements. It never reruns Codex or publishes. A regression test covers unfinished, improved and unchanged results. Reopening the actual report recovered and persisted `done`; both receipts and CHECKED BY JHOL displayed after reload. Proof: `evals/verification/ui-2026-11-01T09-37-20-716Z.json`. The sibling repository was clean and on main afterward. Required checks: build passed, core 16/16, API 11/11.
+
+Existing PR #1 was verified read-only at published commit `e55f4a9b08197b44b3556bb950ac7297f30ed567`. Its exact code was served on 5051 and audited through the UI as `b8eab4e7-a75b-4ab2-9b42-540744e25dfe` (₹499, score 55; all 11 screenshots stored/downloaded). The original before-audit's missing in-memory PR metadata was explicitly recovered into Supabase and linked to this fresh persisted re-audit. This was a metadata recovery, not a new PR publication or a worker-created PR in this session. The real PR link, fixed audit link, and receipts survived a page reload; proof is `evals/verification/existing-pr-receipt.json` and its PNG. The historical score-63 after-audit is absent from Supabase; only its summary was retained. Both the new local fix and existing published code now have full saved journeys/findings for diagnosis. The store was restored to clean main. No pushes were performed.
+
 ## A — Passed
 
 Three real OpenAI CLI runs reached payment with ₹499 → ₹606 and exactly two drip-pricing findings, two basket-sneaking findings, one subscription trap and one nagging finding. Times: 54.5s, 80.3s, 65.8s. The two-session run with `SESSION_B_DELAY_MS=60000` reached payment in both sessions and added two false-urgency findings (144.6s total). Raw counts are in `evals/agent-checks-2026-11-01.json`.

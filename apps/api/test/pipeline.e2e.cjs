@@ -160,6 +160,25 @@ test("an agent error fails the run and the audit, with the reason", async () => 
   assert.deepEqual(view.runs.map((r) => [r.session, r.status]), [["A", "FAILED"]]);
 });
 
+test("a saved re-audit recovers a fix left rechecking after its worker lost its lease", async () => {
+  const before = await db.createAudit({ url: process.env.FIX_STORE_URL, sessions: 1, options: {} });
+  const after = await db.createAudit({ url: process.env.FIX_STORE_URL, sessions: 1, options: {} });
+  await db.finishAudit(before.id, { status: "done", price_final: 606, score: 3 });
+  await db.updateFix(before.id, { fix_status: "rechecking", fixed_audit_id: after.id });
+  let view = await (await api(`/audits/${before.id}`)).json();
+  assert.equal(view.audit.fix_status, "rechecking", "unfinished audit cannot mark the fix done");
+  await db.finishAudit(after.id, { status: "done", price_final: 499, score: 55 });
+  view = await (await api(`/audits/${before.id}`)).json();
+  assert.equal(view.audit.fix_status, "done");
+  assert.equal((await db.getAudit(before.id)).fix_status, "done", "recovery must persist");
+  assert.equal(view.fix_after.id, after.id);
+  const worse = await db.createAudit({ url: process.env.FIX_STORE_URL, sessions: 1, options: {} });
+  await db.finishAudit(worse.id, { status: "done", price_final: 606, score: 3 });
+  await db.updateFix(worse.id, { fix_status: "rechecking", fixed_audit_id: before.id });
+  view = await (await api(`/audits/${worse.id}`)).json();
+  assert.equal(view.audit.fix_status, "failed", "an unchanged result must never be stamped checked");
+});
+
 test("fix endpoint restricts the target, requires a finished audit, and queues exactly once", async () => {
   const wrong = await db.createAudit({ url: "https://1.1.1.1/", sessions: 1, options: {} });
   await db.finishAudit(wrong.id, { status: "done" });

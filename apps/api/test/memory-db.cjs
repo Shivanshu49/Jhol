@@ -58,7 +58,10 @@ class MemoryDb {
     Object.assign(audit, { fix_status: "queued", fix_error: null, fix_pr_url: null, fix_branch: null, fixed_audit_id: null, fix_message: null, fix_diff_summary: null });
     return true;
   }
-  async updateFix(id, patch) { Object.assign(this.audits.get(id), patch); }
+  async updateFix(id, patch, expectedStatus) {
+    const audit = this.audits.get(id);
+    if (!expectedStatus || audit.fix_status === expectedStatus) Object.assign(audit, patch);
+  }
 }
 
 module.exports = { MemoryDb };

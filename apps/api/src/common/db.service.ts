@@ -139,8 +139,10 @@ export class DbService {
     return this.must(res, "claim fix").length === 1;
   }
 
-  async updateFix(id: string, patch: FixFields): Promise<void> {
-    this.must(await this.sb.from("audits").update(patch).eq("id", id).select("id"), "update fix");
+  async updateFix(id: string, patch: FixFields, expectedStatus?: FixStatus): Promise<void> {
+    let query = this.sb.from("audits").update(patch).eq("id", id);
+    if (expectedStatus) query = query.eq("fix_status", expectedStatus);
+    this.must(await query.select("id"), "update fix");
   }
 
   async upsertRun(input: Partial<RunRow> & { audit_id: string; session: Session }): Promise<RunRow> {

@@ -1,0 +1,934 @@
+{
+  "target": "http://localhost:5051/index.html",
+  "twice": false,
+  "triggerFix": true,
+  "createdThroughUI": false,
+  "resumedAudit": "383af613-ba90-42bb-aa46-6af932802a78",
+  "stubbed": false,
+  "publishing": false,
+  "auditId": "383af613-ba90-42bb-aa46-6af932802a78",
+  "before": {
+    "audit": {
+      "id": "383af613-ba90-42bb-aa46-6af932802a78",
+      "url": "http://localhost:5051/index.html",
+      "journey": "checkout",
+      "sessions": 1,
+      "options": {},
+      "status": "done",
+      "error": null,
+      "price_shown": 499,
+      "price_final": 606,
+      "score": 3,
+      "report_hash": "a7ce13a85ddab4926186ab24fd0477848278a3bca9a4da7ca1e05306a6e02a8d",
+      "created_at": "2026-11-01T08:42:37.916067+00:00",
+      "finished_at": "2026-11-01T08:43:36.064+00:00",
+      "fix_status": "done",
+      "fix_pr_url": null,
+      "fix_branch": "jhol-fix-383af613-mvxl26je",
+      "fixed_audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+      "fix_error": null,
+      "fix_message": "Updated only [index.html](/home/shivanshu/Desktop/Code/chalak-mart/index.html): removed hidden fees, automatic donation and fake urgency; made extras opt-in, declines equally visible, and newsletter popup session-limited.\n\nOffline logic checks passed: the tee stays ₹499 through the disabled payment-method page. Browser visual checks were blocked by the sandbox. No payment data entered or purchases made.",
+      "fix_diff_summary": "index.html | 139 ++++++++++++++++++++++++++++---------------------------------\n 1 file changed, 63 insertions(+), 76 deletions(-)"
+    },
+    "runs": [
+      {
+        "id": "9a1c27c6-4dc3-4be4-985b-b7f0cd174ceb",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "session": "A",
+        "tinyfish_run_id": null,
+        "status": "COMPLETED",
+        "streaming_url": null,
+        "video_url": null,
+        "started_at": "2026-11-01T08:42:38.556+00:00",
+        "num_steps": 17,
+        "error": null,
+        "created_at": "2026-11-01T08:42:38.796497+00:00",
+        "reached_payment_page": true,
+        "stop_reason": "Reached payment step",
+        "pages": [
+          "home",
+          "product",
+          "cart",
+          "checkout",
+          "review",
+          "payment"
+        ],
+        "steps": [
+          {
+            "idx": 1,
+            "page": "home",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/1.jpg"
+          },
+          {
+            "idx": 2,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View the cheapest product details to add to cart",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/2.jpg"
+          },
+          {
+            "idx": 3,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add one unit of the cheapest product to cart · Action failed: That element is covered by a popup or overlay. Decline/close the popup first.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/3.jpg"
+          },
+          {
+            "idx": 4,
+            "page": "product",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup overlay blocking the Add to cart button",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/4.jpg"
+          },
+          {
+            "idx": 5,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add the cheapest product, Cotton Crew Tee, to the cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/5.jpg"
+          },
+          {
+            "idx": 6,
+            "page": "cart",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer on cart page",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/6.jpg"
+          },
+          {
+            "idx": 7,
+            "page": "cart",
+            "action": "click \"Proceed to checkout\"",
+            "reason": "Proceed to checkout",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/7.jpg"
+          },
+          {
+            "idx": 8,
+            "page": "cart",
+            "action": "click \"No thanks, I don't mind if my order arrives broken\"",
+            "reason": "Decline the popup offer on cart page",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/8.jpg"
+          },
+          {
+            "idx": 9,
+            "page": "checkout",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer on checkout page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/9.jpg"
+          },
+          {
+            "idx": 10,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "fill guest checkout full name",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/10.jpg"
+          },
+          {
+            "idx": 11,
+            "page": "checkout",
+            "action": "fill = \"test@example.com\"",
+            "reason": "Fill guest checkout email",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/11.jpg"
+          },
+          {
+            "idx": 12,
+            "page": "checkout",
+            "action": "fill = \"110001\"",
+            "reason": "Fill guest checkout pincode",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/12.jpg"
+          },
+          {
+            "idx": 13,
+            "page": "checkout",
+            "action": "click \"Continue to review\"",
+            "reason": "Continue to review after filling delivery details",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/13.jpg"
+          },
+          {
+            "idx": 14,
+            "page": "review",
+            "action": "click \"Not now\"",
+            "reason": "Decline the join club popup to proceed to payment step",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/14.jpg"
+          },
+          {
+            "idx": 15,
+            "page": "review",
+            "action": "stop",
+            "reason": "Reached payment step, stopping before payment details. · Action failed: You chose stop, but no payment options are visible, so this is not the payment step. Continue towards payment. Stop only at payment or if the site demands phone/OTP/login.",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/15.jpg"
+          },
+          {
+            "idx": 16,
+            "page": "review",
+            "action": "click \"Continue to payment\"",
+            "reason": "Proceed to payment step",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/16.jpg"
+          },
+          {
+            "idx": 17,
+            "page": "payment",
+            "action": "stop",
+            "reason": "Payment options visible; never submit an order or payment.",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/17.jpg"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "a4be8bdd-0dba-4f22-93b9-0cabb623afd1",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "drip_pricing",
+        "severity": "high",
+        "page": "review",
+        "evidence": "Platform fee — ₹19",
+        "detail": "\"Platform fee\" (₹19) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "6c752a0b-2276-47f5-b7c6-419c0669efb8",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "drip_pricing",
+        "severity": "high",
+        "page": "review",
+        "evidence": "Handling fee — ₹29",
+        "detail": "\"Handling fee\" (₹29) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "8f2097a6-ae69-407a-908f-8bf42f318516",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Order Protection — ₹49",
+        "detail": "\"Order Protection\" came pre-selected, so the shopper has to spot it and opt out themselves.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "3bc1bc44-397a-4819-ac5a-12a3bc464672",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Donation to Green India Fund — ₹10",
+        "detail": "\"Donation to Green India Fund\" (₹10) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "1267562a-74a2-4e60-93ff-c94e136362dc",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "subscription_trap",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "ChalakPlus 7-day free trial — ₹0",
+        "detail": "\"ChalakPlus 7-day free trial\" was pre-selected, so the shopper can end up on a recurring paid plan without actively choosing it.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "4072a1f9-91c8-4c5d-bfdd-b80f055c05f7",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "confirm_shaming",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "\"No thanks, I don't mind if my order arrives broken\"",
+        "detail": "The decline option uses shame to guilt the shopper into choosing order protection.",
+        "source": "llm",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "6e86609e-5571-493a-ba51-a0263be18daa",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "nagging",
+        "severity": "medium",
+        "page": "home, product, cart, checkout, review",
+        "evidence": "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+        "detail": "The same popup interrupted the shopper on 5 pages (home, product, cart, checkout, review).",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      }
+    ],
+    "precedents": {},
+    "fix_available": true,
+    "fix_after": {
+      "id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+      "status": "done",
+      "score": 55,
+      "price_final": 499
+    }
+  },
+  "beforeEvidence": {
+    "rows": 17,
+    "screenshots": 17,
+    "jpegBytes": 493335
+  },
+  "evidenceShownAfterReload": true,
+  "fixed": {
+    "audit": {
+      "id": "383af613-ba90-42bb-aa46-6af932802a78",
+      "url": "http://localhost:5051/index.html",
+      "journey": "checkout",
+      "sessions": 1,
+      "options": {},
+      "status": "done",
+      "error": null,
+      "price_shown": 499,
+      "price_final": 606,
+      "score": 3,
+      "report_hash": "a7ce13a85ddab4926186ab24fd0477848278a3bca9a4da7ca1e05306a6e02a8d",
+      "created_at": "2026-11-01T08:42:37.916067+00:00",
+      "finished_at": "2026-11-01T08:43:36.064+00:00",
+      "fix_status": "done",
+      "fix_pr_url": null,
+      "fix_branch": "jhol-fix-383af613-mvxl26je",
+      "fixed_audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+      "fix_error": null,
+      "fix_message": "Updated only [index.html](/home/shivanshu/Desktop/Code/chalak-mart/index.html): removed hidden fees, automatic donation and fake urgency; made extras opt-in, declines equally visible, and newsletter popup session-limited.\n\nOffline logic checks passed: the tee stays ₹499 through the disabled payment-method page. Browser visual checks were blocked by the sandbox. No payment data entered or purchases made.",
+      "fix_diff_summary": "index.html | 139 ++++++++++++++++++++++++++++---------------------------------\n 1 file changed, 63 insertions(+), 76 deletions(-)"
+    },
+    "runs": [
+      {
+        "id": "9a1c27c6-4dc3-4be4-985b-b7f0cd174ceb",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "session": "A",
+        "tinyfish_run_id": null,
+        "status": "COMPLETED",
+        "streaming_url": null,
+        "video_url": null,
+        "started_at": "2026-11-01T08:42:38.556+00:00",
+        "num_steps": 17,
+        "error": null,
+        "created_at": "2026-11-01T08:42:38.796497+00:00",
+        "reached_payment_page": true,
+        "stop_reason": "Reached payment step",
+        "pages": [
+          "home",
+          "product",
+          "cart",
+          "checkout",
+          "review",
+          "payment"
+        ],
+        "steps": [
+          {
+            "idx": 1,
+            "page": "home",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/1.jpg"
+          },
+          {
+            "idx": 2,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View the cheapest product details to add to cart",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/2.jpg"
+          },
+          {
+            "idx": 3,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add one unit of the cheapest product to cart · Action failed: That element is covered by a popup or overlay. Decline/close the popup first.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/3.jpg"
+          },
+          {
+            "idx": 4,
+            "page": "product",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup overlay blocking the Add to cart button",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/4.jpg"
+          },
+          {
+            "idx": 5,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add the cheapest product, Cotton Crew Tee, to the cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/5.jpg"
+          },
+          {
+            "idx": 6,
+            "page": "cart",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer on cart page",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/6.jpg"
+          },
+          {
+            "idx": 7,
+            "page": "cart",
+            "action": "click \"Proceed to checkout\"",
+            "reason": "Proceed to checkout",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/7.jpg"
+          },
+          {
+            "idx": 8,
+            "page": "cart",
+            "action": "click \"No thanks, I don't mind if my order arrives broken\"",
+            "reason": "Decline the popup offer on cart page",
+            "total_shown": 558,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/8.jpg"
+          },
+          {
+            "idx": 9,
+            "page": "checkout",
+            "action": "click \"Not now\"",
+            "reason": "Decline the popup offer on checkout page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/9.jpg"
+          },
+          {
+            "idx": 10,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "fill guest checkout full name",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/10.jpg"
+          },
+          {
+            "idx": 11,
+            "page": "checkout",
+            "action": "fill = \"test@example.com\"",
+            "reason": "Fill guest checkout email",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/11.jpg"
+          },
+          {
+            "idx": 12,
+            "page": "checkout",
+            "action": "fill = \"110001\"",
+            "reason": "Fill guest checkout pincode",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/12.jpg"
+          },
+          {
+            "idx": 13,
+            "page": "checkout",
+            "action": "click \"Continue to review\"",
+            "reason": "Continue to review after filling delivery details",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/13.jpg"
+          },
+          {
+            "idx": 14,
+            "page": "review",
+            "action": "click \"Not now\"",
+            "reason": "Decline the join club popup to proceed to payment step",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/14.jpg"
+          },
+          {
+            "idx": 15,
+            "page": "review",
+            "action": "stop",
+            "reason": "Reached payment step, stopping before payment details. · Action failed: You chose stop, but no payment options are visible, so this is not the payment step. Continue towards payment. Stop only at payment or if the site demands phone/OTP/login.",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/15.jpg"
+          },
+          {
+            "idx": 16,
+            "page": "review",
+            "action": "click \"Continue to payment\"",
+            "reason": "Proceed to payment step",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/16.jpg"
+          },
+          {
+            "idx": 17,
+            "page": "payment",
+            "action": "stop",
+            "reason": "Payment options visible; never submit an order or payment.",
+            "total_shown": 606,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/383af613-ba90-42bb-aa46-6af932802a78/A/17.jpg"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "a4be8bdd-0dba-4f22-93b9-0cabb623afd1",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "drip_pricing",
+        "severity": "high",
+        "page": "review",
+        "evidence": "Platform fee — ₹19",
+        "detail": "\"Platform fee\" (₹19) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "6c752a0b-2276-47f5-b7c6-419c0669efb8",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "drip_pricing",
+        "severity": "high",
+        "page": "review",
+        "evidence": "Handling fee — ₹29",
+        "detail": "\"Handling fee\" (₹29) wasn't shown when the price first appeared on the product page; it only shows up at review.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "8f2097a6-ae69-407a-908f-8bf42f318516",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Order Protection — ₹49",
+        "detail": "\"Order Protection\" came pre-selected, so the shopper has to spot it and opt out themselves.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "3bc1bc44-397a-4819-ac5a-12a3bc464672",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Donation to Green India Fund — ₹10",
+        "detail": "\"Donation to Green India Fund\" (₹10) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "1267562a-74a2-4e60-93ff-c94e136362dc",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "subscription_trap",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "ChalakPlus 7-day free trial — ₹0",
+        "detail": "\"ChalakPlus 7-day free trial\" was pre-selected, so the shopper can end up on a recurring paid plan without actively choosing it.",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "4072a1f9-91c8-4c5d-bfdd-b80f055c05f7",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "confirm_shaming",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "\"No thanks, I don't mind if my order arrives broken\"",
+        "detail": "The decline option uses shame to guilt the shopper into choosing order protection.",
+        "source": "llm",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      },
+      {
+        "id": "6e86609e-5571-493a-ba51-a0263be18daa",
+        "audit_id": "383af613-ba90-42bb-aa46-6af932802a78",
+        "pattern": "nagging",
+        "severity": "medium",
+        "page": "home, product, cart, checkout, review",
+        "evidence": "🎁 Get 10% off your first order! Join the Chalak Club for secret deals in your inbox.",
+        "detail": "The same popup interrupted the shopper on 5 pages (home, product, cart, checkout, review).",
+        "source": "rule",
+        "created_at": "2026-11-01T08:43:35.995839+00:00"
+      }
+    ],
+    "precedents": {},
+    "fix_available": true,
+    "fix_after": {
+      "id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+      "status": "done",
+      "score": 55,
+      "price_final": 499
+    }
+  },
+  "after": {
+    "audit": {
+      "id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+      "url": "http://localhost:5051/index.html",
+      "journey": "checkout",
+      "sessions": 1,
+      "options": {},
+      "status": "done",
+      "error": null,
+      "price_shown": 499,
+      "price_final": 499,
+      "score": 55,
+      "report_hash": "9eeec810c4044289989193437f727510ca28ff8280c355fdaab4970bb85f0dd2",
+      "created_at": "2026-11-01T08:52:32.946726+00:00",
+      "finished_at": "2026-11-01T09:31:29.078+00:00",
+      "fix_status": null,
+      "fix_pr_url": null,
+      "fix_branch": null,
+      "fixed_audit_id": null,
+      "fix_error": null,
+      "fix_message": null,
+      "fix_diff_summary": null
+    },
+    "runs": [
+      {
+        "id": "06210aa3-c45f-4b34-88b5-8dd0506d0207",
+        "audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+        "session": "A",
+        "tinyfish_run_id": null,
+        "status": "COMPLETED",
+        "streaming_url": null,
+        "video_url": null,
+        "started_at": "2026-11-01T09:30:10.046+00:00",
+        "num_steps": 13,
+        "error": null,
+        "created_at": "2026-11-01T08:52:33.243768+00:00",
+        "reached_payment_page": true,
+        "stop_reason": "Reached payment step",
+        "pages": [
+          "home",
+          "product",
+          "cart",
+          "checkout",
+          "cart",
+          "checkout",
+          "review",
+          "payment"
+        ],
+        "steps": [
+          {
+            "idx": 1,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "View cheapest product, Cotton Crew Tee · Action failed: That element is covered by a popup or overlay. Decline/close the popup first.",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/1.jpg"
+          },
+          {
+            "idx": 2,
+            "page": "home",
+            "action": "click \"Not now\"",
+            "reason": "decline first-time shopper popup to access the page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/2.jpg"
+          },
+          {
+            "idx": 3,
+            "page": "home",
+            "action": "click \"View\"",
+            "reason": "Click the cheapest in-stock product's View button (Cotton Crew Tee ₹499) to go to its product page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/3.jpg"
+          },
+          {
+            "idx": 4,
+            "page": "product",
+            "action": "click \"Add to cart\"",
+            "reason": "Add exactly one unit of the cheapest product to cart",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/4.jpg"
+          },
+          {
+            "idx": 5,
+            "page": "cart",
+            "action": "click \"Proceed to checkout\"",
+            "reason": "Proceed to checkout from cart page",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/5.jpg"
+          },
+          {
+            "idx": 6,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "Fill in name for guest checkout · Action failed: There is no element \"input[name='fullname']\" on the page now (it changed; a popup you closed is gone). Use only ids from the current snapshot.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/6.jpg"
+          },
+          {
+            "idx": 7,
+            "page": "cart",
+            "action": "click \"Continue without it\"",
+            "reason": "Decline optional damage shield upsell to proceed to checkout",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/7.jpg"
+          },
+          {
+            "idx": 8,
+            "page": "checkout",
+            "action": "fill = \"Test User\"",
+            "reason": "Fill full name on checkout page",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/8.jpg"
+          },
+          {
+            "idx": 9,
+            "page": "checkout",
+            "action": "fill = \"test@example.com\"",
+            "reason": "Fill email for guest checkout",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/9.jpg"
+          },
+          {
+            "idx": 10,
+            "page": "checkout",
+            "action": "fill = \"110001\"",
+            "reason": "Fill pincode for delivery details",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/10.jpg"
+          },
+          {
+            "idx": 11,
+            "page": "checkout",
+            "action": "click \"Continue to review\"",
+            "reason": "Click continue to review to proceed towards payment step",
+            "total_shown": null,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/11.jpg"
+          },
+          {
+            "idx": 12,
+            "page": "review",
+            "action": "click \"Continue to payment\"",
+            "reason": "Proceed from review to payment step",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/12.jpg"
+          },
+          {
+            "idx": 13,
+            "page": "payment",
+            "action": "stop",
+            "reason": "Payment options visible; never submit an order or payment.",
+            "total_shown": 499,
+            "screenshot_url": "https://vedxagzptjakadgvaxga.supabase.co/storage/v1/object/public/screens/0d1a31a8-5b8f-432c-973d-039a31544a1e/A/13.jpg"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "02dd4370-e9b2-4094-9530-36e2fc0159f7",
+        "audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "product",
+        "evidence": "Cotton Crew Tee — ₹499",
+        "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:31:28.972251+00:00"
+      },
+      {
+        "id": "4060e7d3-1d79-44b5-a889-689294b2116e",
+        "audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+        "pattern": "basket_sneaking",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Order Protection (optional): covers loss in transit — ₹49",
+        "detail": "\"Order Protection (optional): covers loss in transit\" (₹49) is in the order, but the shopper never added it.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:31:28.972251+00:00"
+      },
+      {
+        "id": "b47880e9-f65a-4d81-95e7-19ff5715cce3",
+        "audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e",
+        "pattern": "subscription_trap",
+        "severity": "high",
+        "page": "cart",
+        "evidence": "Start ChalakPlus 7-day free trial (optional): ₹0 today Renews at ₹199/month after 7 days unless cancelled. — ₹0",
+        "detail": "\"Start ChalakPlus 7-day free trial (optional): ₹0 today Renews at ₹199/month after 7 days unless cancelled.\" is in the order although the shopper never chose a subscription.",
+        "source": "rule",
+        "created_at": "2026-11-01T09:31:28.972251+00:00"
+      }
+    ],
+    "precedents": {},
+    "fix_available": true,
+    "fix_after": null
+  },
+  "afterEvidence": {
+    "rows": 13,
+    "screenshots": 13,
+    "jpegBytes": 352113
+  },
+  "storedFix": {
+    "fix_status": "done",
+    "fix_pr_url": null,
+    "fix_branch": "jhol-fix-383af613-mvxl26je",
+    "fixed_audit_id": "0d1a31a8-5b8f-432c-973d-039a31544a1e"
+  },
+  "afterFindings": [
+    {
+      "pattern": "basket_sneaking",
+      "page": "product",
+      "severity": "high",
+      "evidence": "Cotton Crew Tee — ₹499",
+      "detail": "\"Cotton Crew Tee\" (₹499) is in the order, but the shopper never added it.",
+      "source": "rule"
+    },
+    {
+      "pattern": "basket_sneaking",
+      "page": "cart",
+      "severity": "high",
+      "evidence": "Order Protection (optional): covers loss in transit — ₹49",
+      "detail": "\"Order Protection (optional): covers loss in transit\" (₹49) is in the order, but the shopper never added it.",
+      "source": "rule"
+    },
+    {
+      "pattern": "subscription_trap",
+      "page": "cart",
+      "severity": "high",
+      "evidence": "Start ChalakPlus 7-day free trial (optional): ₹0 today Renews at ₹199/month after 7 days unless cancelled. — ₹0",
+      "detail": "\"Start ChalakPlus 7-day free trial (optional): ₹0 today Renews at ₹199/month after 7 days unless cancelled.\" is in the order although the shopper never chose a subscription.",
+      "source": "rule"
+    }
+  ],
+  "afterRuns": [
+    {
+      "id": "06210aa3-c45f-4b34-88b5-8dd0506d0207",
+      "session": "A",
+      "result": {
+        "steps": [
+          {
+            "page": "home",
+            "popups": [
+              "Get 10% off your first order!"
+            ],
+            "line_items": [],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [
+              "Join now",
+              "Not now"
+            ],
+            "urgency_texts": []
+          },
+          {
+            "page": "product",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "cart",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "checkout",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "cart",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Order Protection (₹49, optional): covers loss in transit",
+                "amount": 49
+              },
+              {
+                "label": "Start ChalakPlus 7-day free trial (optional): ₹0 today Renews at ₹199/month after 7 days unless cancelled.",
+                "amount": 0
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": [
+              "Add Damage Shield for ₹39 for a replacement if anything arrives broken."
+            ]
+          },
+          {
+            "page": "checkout",
+            "popups": [],
+            "line_items": [],
+            "preselected": [],
+            "total_shown": null,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "review",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Cotton Crew Tee",
+                "amount": 499
+              },
+              {
+                "label": "Delivery FREE",
+                "amount": 0
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          },
+          {
+            "page": "payment",
+            "popups": [],
+            "line_items": [
+              {
+                "label": "Amount payable",
+                "amount": 499
+              }
+            ],
+            "preselected": [],
+            "total_shown": 499,
+            "choice_texts": [],
+            "urgency_texts": []
+          }
+        ],
+        "stop_reason": "Reached payment step",
+        "items_added_by_agent": [],
+        "reached_payment_page": true
+      },
+      "num_steps": 13
+    }
+  ],
+  "receiptsShownAfterReload": true,
+  "restoredBranch": "main",
+  "browserErrors": []
+}

@@ -62,12 +62,22 @@ export class AuditsService {
 
   /** Everything the dashboard needs for one audit. Raw agent results stay server-side. */
   async view(id: string) {
-    const audit = await this.db.getAudit(id);
+    let audit = await this.db.getAudit(id);
     if (!audit) return null;
     const [runs, findings] = await Promise.all([this.db.getRuns(id), this.db.getFindings(id)]);
     const steps = await this.db.getSteps(runs.map((r) => r.id));
-    const { precedents, ...rest } = audit;
     const fixed = audit.fixed_audit_id ? await this.db.getAudit(audit.fixed_audit_id) : null;
+    // A worker can lose its Redis lease during a laptop suspend after saving the re-audit.
+    // Recover from the durable result, without running Codex or publishing again.
+    if (audit.fix_status === "rechecking" && fixed && (fixed.status === "done" || fixed.status === "failed")) {
+      const improved = fixed.status === "done" && fixed.score !== null && audit.score !== null
+        && fixed.price_final !== null && audit.price_final !== null
+        && fixed.score > audit.score && fixed.price_final < audit.price_final;
+      await this.db.updateFix(id, { fix_status: improved ? "done" : "failed", fix_error: improved ? null
+        : fixed.error || "Re-audit did not improve both the score and the final price. Inspect the before/after receipts." }, "rechecking");
+      audit = await this.db.getAudit(id) ?? audit;
+    }
+    const { precedents, ...rest } = audit;
     return {
       audit: rest,
       runs: runs.map(({ result, ...run }) => ({
