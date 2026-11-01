@@ -8,6 +8,7 @@ import { runJourney } from "@jhol/core";
 import { AuditsProcessor, RUN_JOURNEY } from "./audits/audits.processor";
 import { AuditsService } from "./audits/audits.service";
 import { JudgeService } from "./audits/judge.service";
+import { FixService, RUN_CODEX, runCodex } from "./audits/fix.service";
 import { DbService } from "./common/db.service";
 import { AUDIT_QUEUE } from "./common/queue";
 import { redisConnection } from "./common/redis";
@@ -37,7 +38,7 @@ export class AppModule {
       providers: [
         DbService,
         AuditsService,
-        ...(runJobs ? [AuditsProcessor, JudgeService, { provide: RUN_JOURNEY, useValue: runJourney }] : []),
+        ...(runJobs ? [AuditsProcessor, JudgeService, FixService, { provide: RUN_JOURNEY, useValue: runJourney }, { provide: RUN_CODEX, useValue: runCodex }] : []),
         ...(serveHttp ? [{ provide: APP_GUARD, useClass: ThrottlerGuard }] : []),
       ],
     };

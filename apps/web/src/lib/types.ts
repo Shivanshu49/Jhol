@@ -36,12 +36,26 @@ export type Audit = {
   report_hash: string | null;
   created_at: string;
   finished_at: string | null;
+  fix_status?: "queued" | "fixing" | "pr_opened" | "rechecking" | "done" | "failed" | null;
+  fix_pr_url?: string | null;
+  fix_branch?: string | null;
+  fixed_audit_id?: string | null;
+  fix_error?: string | null;
+  fix_message?: string | null;
+  fix_diff_summary?: string | null;
 };
 
 /** A news / government page where regulators acted on the same dark pattern (Exa search). */
 export type Precedent = { title: string; url: string; publishedDate?: string; snippet: string };
 
-export type AuditView = { audit: Audit; runs: Run[]; findings: Finding[]; precedents?: Record<string, Precedent[]> };
+export type AuditView = {
+  audit: Audit;
+  runs: Run[];
+  findings: Finding[];
+  precedents?: Record<string, Precedent[]>;
+  fix_available?: boolean;
+  fix_after?: { id: string; status: Audit["status"]; score: number | null; price_final: number | null } | null;
+};
 
 /** CCPA's 13 dark patterns (Guidelines for Prevention and Regulation of Dark Patterns, 2023). */
 export const PATTERNS: Record<string, { label: string; what: string }> = {

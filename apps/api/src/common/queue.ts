@@ -5,11 +5,13 @@ export const AUDIT_QUEUE = "audits";
 export const JOB = {
   START_SESSION: "start-session", // run the browser agent once (session A now, B ~2 min later)
   FINALIZE: "finalize", // all sessions done → detectors + LLM judge → findings + sealed report
+  FIX: "fix",
 } as const;
 
 export type Session = "A" | "B";
 export type StartSessionJob = { auditId: string; session: Session };
 export type FinalizeJob = { auditId: string };
+export type FixJob = { auditId: string };
 
 export const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 

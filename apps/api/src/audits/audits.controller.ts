@@ -20,6 +20,11 @@ export class AuditsController {
     return this.audits.list();
   }
 
+  @Post(":id/fix")
+  fix(@Param("id", new ParseUUIDPipe()) id: string) {
+    return this.audits.requestFix(id);
+  }
+
   @Get(":id")
   async get(@Param("id", new ParseUUIDPipe()) id: string) {
     const view = await this.audits.view(id);

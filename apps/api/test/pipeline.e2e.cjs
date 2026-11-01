@@ -17,67 +17,19 @@ process.env.OPENAI_API_KEY = ""; // judge off: rule findings only (beats apps/ap
 process.env.EXA_API_KEY = ""; // no precedents: the audit must still finish
 process.env.ALLOW_PRIVATE_TARGETS = ""; // production default: private targets refused
 process.env.SESSION_B_DELAY_MS = "1500";
+process.env.FIX_REPO_PATH = "/tmp/jhol-test-store";
+process.env.FIX_STORE_URL = "http://localhost:5051/index.html";
 
 const { Test } = require("@nestjs/testing");
 const { getQueueToken } = require("@nestjs/bullmq");
 const { AppModule } = require("../dist/app.module");
 const { DbService } = require("../dist/common/db.service");
 const { RUN_JOURNEY } = require("../dist/audits/audits.processor");
+const { FixService } = require("../dist/audits/fix.service");
 
 // ---------------------------------------------------------------- in-memory DB (same methods as DbService)
 
-class MemoryDb {
-  audits = new Map();
-  runs = new Map();
-  findings = [];
-
-  async createAudit(input) {
-    const audit = { id: randomUUID(), journey: "checkout", status: "running", error: null, price_shown: null, price_final: null, score: null, report_hash: null, precedents: {}, created_at: new Date().toISOString(), finished_at: null, ...input };
-    this.audits.set(audit.id, audit);
-    return { ...audit };
-  }
-  async getAudit(id) { const a = this.audits.get(id); return a ? { ...a } : null; }
-  async listAudits() { return [...this.audits.values()].map((a) => ({ ...a })); }
-  async claimAudit(id) {
-    const a = this.audits.get(id);
-    if (!a || a.status !== "running") return false;
-    a.status = "finalizing";
-    return true;
-  }
-  async finishAudit(id, patch) { Object.assign(this.audits.get(id), patch, { finished_at: new Date().toISOString() }); }
-  async failAudit(id, error) {
-    const a = this.audits.get(id);
-    if (a && (a.status === "running" || a.status === "finalizing")) Object.assign(a, { status: "failed", error });
-  }
-  async upsertRun(input) {
-    let run = [...this.runs.values()].find((r) => r.audit_id === input.audit_id && r.session === input.session);
-    if (!run) {
-      run = { id: randomUUID(), status: "PENDING", started_at: null, num_steps: null, result: null, error: null, created_at: new Date().toISOString() };
-      this.runs.set(run.id, run);
-    }
-    Object.assign(run, input);
-    // Pretend B started 2m05s after A (the real gap), not the test's 1.5 s, so the restarted-timer rule can fire.
-    if (input.session === "B" && input.started_at) run.started_at = new Date(Date.parse(input.started_at) + 125_000).toISOString();
-    return { ...run };
-  }
-  async getRuns(auditId) {
-    return [...this.runs.values()].filter((r) => r.audit_id === auditId).sort((a, b) => a.session.localeCompare(b.session)).map((r) => ({ ...r }));
-  }
-  async updateRun(id, patch) { Object.assign(this.runs.get(id), patch); }
-  async insertFindings(auditId, list) {
-    for (const f of list) this.findings.push({ id: randomUUID(), audit_id: auditId, created_at: new Date().toISOString(), ...f });
-  }
-  async getFindings(auditId) { return this.findings.filter((f) => f.audit_id === auditId); }
-  steps = [];
-  screens = new Map();
-  async uploadScreenshot(path, jpeg) { this.screens.set(path, jpeg); }
-  screenshotUrl(path) { return `https://storage.example/screens/${path}`; }
-  async upsertStep(step) { this.steps = this.steps.filter((s) => !(s.run_id === step.run_id && s.idx === step.idx)).concat(step); }
-  async getSteps(runIds) { return this.steps.filter((s) => runIds.includes(s.run_id)).sort((a, b) => a.idx - b.idx); }
-  precedentRows = new Map();
-  async getPrecedents(pattern) { return this.precedentRows.get(pattern) ?? null; }
-  async savePrecedents(pattern, results) { this.precedentRows.set(pattern, { pattern, results, fetched_at: new Date().toISOString() }); }
-}
+const { MemoryDb } = require("./memory-db.cjs");
 
 // ---------------------------------------------------------------- stub browser agent
 
@@ -114,6 +66,7 @@ async function stubRunJourney(url, opts) {
 let app;
 let baseUrl;
 const db = new MemoryDb();
+let fixCalls = 0;
 const api = (path, init = {}) =>
   fetch(`${baseUrl}${path}`, { ...init, headers: { "content-type": "application/json", "x-api-key": "test-key", ...(init.headers ?? {}) } });
 
@@ -123,6 +76,8 @@ before(async () => {
     .useValue(db)
     .overrideProvider(RUN_JOURNEY)
     .useValue(stubRunJourney)
+    .overrideProvider(FixService)
+    .useValue({ run: async (id) => { fixCalls++; await db.updateFix(id, { fix_status: "done" }); return "done"; } })
     .compile();
   app = moduleRef.createNestApplication({ logger: ["error"] });
   await app.listen(0, "127.0.0.1");
@@ -203,4 +158,24 @@ test("an agent error fails the run and the audit, with the reason", async () => 
   assert.equal(view.audit.status, "failed");
   assert.match(view.audit.error, /ERR_NAME_NOT_RESOLVED/);
   assert.deepEqual(view.runs.map((r) => [r.session, r.status]), [["A", "FAILED"]]);
+});
+
+test("fix endpoint restricts the target, requires a finished audit, and queues exactly once", async () => {
+  const wrong = await db.createAudit({ url: "https://1.1.1.1/", sessions: 1, options: {} });
+  await db.finishAudit(wrong.id, { status: "done" });
+  assert.equal((await api(`/audits/${wrong.id}/fix`, { method: "POST" })).status, 400);
+  const audit = await db.createAudit({ url: process.env.FIX_STORE_URL, sessions: 1, options: {} });
+  assert.equal((await api(`/audits/${audit.id}/fix`, { method: "POST" })).status, 409);
+  await db.finishAudit(audit.id, { status: "done", price_final: 606, score: 0 });
+  assert.equal((await api(`/audits/${audit.id}/fix`, { method: "POST" })).status, 400);
+  await db.insertFindings(audit.id, [{ pattern: "basket_sneaking", severity: "high", page: "cart", evidence: "Donation", detail: "Auto-added", source: "rule" }]);
+  const unauthorized = await fetch(`${baseUrl}/audits/${audit.id}/fix`, { method: "POST" });
+  assert.equal(unauthorized.status, 401);
+  assert.equal((await api(`/audits/${audit.id}/fix`, { method: "POST" })).status, 201);
+  assert.equal((await api(`/audits/${audit.id}/fix`, { method: "POST" })).status, 201);
+  for (let i = 0; i < 20 && fixCalls === 0; i++) await new Promise((r) => setTimeout(r, 50));
+  assert.equal(fixCalls, 1);
+  const view = await (await api(`/audits/${audit.id}`)).json();
+  assert.equal(view.fix_available, true);
+  assert.equal(view.audit.fix_status, "done");
 });

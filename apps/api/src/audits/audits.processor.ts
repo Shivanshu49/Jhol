@@ -14,6 +14,7 @@ import { DbService } from "../common/db.service";
 import { AUDIT_QUEUE, JOB, KEEP, type FinalizeJob, type Session, TERMINAL, type StartSessionJob } from "../common/queue";
 import { allowPrivateTargets } from "./create-audit";
 import { JudgeService } from "./judge.service";
+import { FixService } from "./fix.service";
 
 const PRECEDENTS_TTL_MS = 24 * 60 * 60 * 1000; // search each pattern at most once a day
 
@@ -41,6 +42,7 @@ export class AuditsProcessor extends WorkerHost {
     private readonly judge: JudgeService,
     @Inject(RUN_JOURNEY) private readonly runJourney: RunJourney,
     @InjectQueue(AUDIT_QUEUE) private readonly queue: Queue,
+    private readonly fixer: FixService,
   ) {
     super();
   }
@@ -51,6 +53,8 @@ export class AuditsProcessor extends WorkerHost {
         return this.startSession(job.data as StartSessionJob);
       case JOB.FINALIZE:
         return this.finalize((job.data as FinalizeJob).auditId);
+      case JOB.FIX:
+        return this.fixer.run((job.data as FinalizeJob).auditId);
       default:
         throw new Error(`Unknown job: ${job.name}`);
     }
@@ -206,6 +210,8 @@ export class AuditsProcessor extends WorkerHost {
         const { auditId, session } = job.data as StartSessionJob;
         await this.db.upsertRun({ audit_id: auditId, session, status: "FAILED", error: `Agent run failed: ${err.message}` });
         await this.enqueueFinalize(auditId);
+      } else if (job.name === JOB.FIX) {
+        await this.db.updateFix((job.data as FinalizeJob).auditId, { fix_status: "failed", fix_error: err.message });
       }
     } catch (e) {
       this.log.error(`Could not record failure of ${job.name} ${job.id}: ${(e as Error).message}`);

@@ -1,4 +1,5 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { InjectQueue } from "@nestjs/bullmq";
 import type { Queue } from "bullmq";
 import { DbService } from "../common/db.service";
@@ -13,6 +14,7 @@ export class AuditsService {
   constructor(
     private readonly db: DbService,
     @InjectQueue(AUDIT_QUEUE) private readonly queue: Queue,
+    private readonly config: ConfigService,
   ) {}
 
   /** Creates the audit and schedules session A now and session B ~2 min later (false-urgency test). */
@@ -38,6 +40,26 @@ export class AuditsService {
     return this.db.listAudits();
   }
 
+  async requestFix(id: string) {
+    const audit = await this.db.getAudit(id);
+    if (!audit) throw new NotFoundException("Audit not found");
+    const repo = this.config.get<string>("FIX_REPO_PATH");
+    const url = this.config.get<string>("FIX_STORE_URL");
+    if (!repo || !url) throw new ServiceUnavailableException("Codex Fix is not configured on this server.");
+    if (audit.url !== url) throw new BadRequestException("Codex Fix is only available for the configured demo store.");
+    if (audit.status !== "done") throw new ConflictException("Wait for the audit to finish before fixing it.");
+    if (audit.fix_status && audit.fix_status !== "failed") return { fix_status: audit.fix_status };
+    if (!(await this.db.getFindings(id)).length) throw new BadRequestException("This audit has no findings to fix.");
+    if (!(await this.db.claimFix(id))) throw new ConflictException("A fix has already been requested.");
+    try {
+      await this.queue.add(JOB.FIX, { auditId: id }, { jobId: `fix-${id}-${Date.now()}`, attempts: 1, ...KEEP });
+    } catch (e) {
+      await this.db.updateFix(id, { fix_status: "failed", fix_error: "Could not queue the fix. Retry when Redis is available." });
+      throw e;
+    }
+    return { fix_status: "queued" };
+  }
+
   /** Everything the dashboard needs for one audit. Raw agent results stay server-side. */
   async view(id: string) {
     const audit = await this.db.getAudit(id);
@@ -45,6 +67,7 @@ export class AuditsService {
     const [runs, findings] = await Promise.all([this.db.getRuns(id), this.db.getFindings(id)]);
     const steps = await this.db.getSteps(runs.map((r) => r.id));
     const { precedents, ...rest } = audit;
+    const fixed = audit.fixed_audit_id ? await this.db.getAudit(audit.fixed_audit_id) : null;
     return {
       audit: rest,
       runs: runs.map(({ result, ...run }) => ({
@@ -58,6 +81,8 @@ export class AuditsService {
       })),
       findings: [...findings].sort((x, y) => (RANK[x.severity] ?? 9) - (RANK[y.severity] ?? 9)),
       precedents: precedents ?? {}, // { [pattern]: [{ title, url, publishedDate?, snippet }] }
+      fix_available: Boolean(this.config.get("FIX_REPO_PATH") && this.config.get("FIX_STORE_URL") === audit.url && audit.status === "done" && findings.length),
+      fix_after: fixed ? { id: fixed.id, status: fixed.status, score: fixed.score, price_final: fixed.price_final } : null,
     };
   }
 }

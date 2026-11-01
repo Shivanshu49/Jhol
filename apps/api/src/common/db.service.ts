@@ -1,13 +1,23 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Finding, JourneyResult, Precedent } from "@jhol/core";
 import type { Session } from "./queue";
 
 export type AuditStatus = "running" | "finalizing" | "done" | "failed";
+export type FixStatus = "queued" | "fixing" | "pr_opened" | "rechecking" | "done" | "failed";
+export type FixFields = {
+  fix_status?: FixStatus | null;
+  fix_pr_url?: string | null;
+  fix_branch?: string | null;
+  fixed_audit_id?: string | null;
+  fix_error?: string | null;
+  fix_message?: string | null;
+  fix_diff_summary?: string | null;
+};
 export type AuditOptions = { pincode?: string };
 
-export type AuditRow = {
+export type AuditRow = FixFields & {
   id: string;
   url: string;
   journey: string;
@@ -118,6 +128,20 @@ export class DbService {
   }
 
   // ---------- runs ----------
+
+  async claimFix(id: string): Promise<boolean> {
+    const res = await this.sb.from("audits").update({ fix_status: "queued", fix_error: null, fix_pr_url: null,
+      fix_branch: null, fixed_audit_id: null, fix_message: null, fix_diff_summary: null })
+      .eq("id", id).eq("status", "done").or("fix_status.is.null,fix_status.eq.failed").select("id");
+    if (res.error && ["PGRST204", "42703"].includes(res.error.code)) {
+      throw new ServiceUnavailableException("Run supabase/migrations/0004_codex_fix.sql in the Supabase SQL editor before requesting a fix.");
+    }
+    return this.must(res, "claim fix").length === 1;
+  }
+
+  async updateFix(id: string, patch: FixFields): Promise<void> {
+    this.must(await this.sb.from("audits").update(patch).eq("id", id).select("id"), "update fix");
+  }
 
   async upsertRun(input: Partial<RunRow> & { audit_id: string; session: Session }): Promise<RunRow> {
     return this.must(

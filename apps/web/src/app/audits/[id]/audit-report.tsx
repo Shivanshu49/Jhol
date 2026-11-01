@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CodexFix, FIX_ACTIVE } from "@/components/codex-fix";
 import { PATTERNS, rupees, type AuditView, type Finding, type Precedent, type Run } from "@/lib/types";
 
 const ACTIVE = new Set(["running", "finalizing"]);
@@ -23,6 +24,7 @@ const RUN_LABEL: Record<string, string> = {
 export function AuditReport({ id }: { id: string }) {
   const [view, setView] = useState<AuditView | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let stopped = false;
@@ -36,7 +38,7 @@ export function AuditReport({ id }: { id: string }) {
         if (stopped) return;
         setView(data);
         setError(null);
-        if (ACTIVE.has(data.audit.status)) timer = setTimeout(tick, 2500);
+        if (ACTIVE.has(data.audit.status) || FIX_ACTIVE.has(data.audit.fix_status ?? "")) timer = setTimeout(tick, 2500);
       } catch (err) {
         if (stopped) return;
         setError((err as Error).message);
@@ -49,7 +51,7 @@ export function AuditReport({ id }: { id: string }) {
       stopped = true;
       if (timer) clearTimeout(timer);
     };
-  }, [id]);
+  }, [id, refreshKey]);
 
   if (!view) return <p className="text-ink/60">{error ?? "Loading audit…"}</p>;
 
@@ -106,6 +108,7 @@ export function AuditReport({ id }: { id: string }) {
       )}
 
       {audit.status === "done" && <Report view={view} findings={findings} />}
+      {audit.status === "done" && <CodexFix view={view} onQueued={() => setRefreshKey((n) => n + 1)} />}
     </div>
   );
 }
