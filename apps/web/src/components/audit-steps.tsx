@@ -9,11 +9,11 @@ export function AuditSteps({ runs }: { runs: Run[] }) {
   if (!runs.some((run) => run.steps?.length)) return null;
   return (
     <section aria-label="Checkout evidence" className="space-y-4">
-      <h2 className="text-sm font-bold uppercase tracking-widest text-ink/50">Checkout evidence</h2>
+      <h2 className="text-sm font-bold uppercase tracking-widest text-white/70">Checkout evidence</h2>
       {runs.filter((run) => run.steps?.length).map((run) => {
         const step = run.steps.find((s) => s.idx === selected[run.id]) ?? run.steps.at(-1)!;
         return (
-          <details key={run.id} open className="border border-dashed border-ink/25 bg-white p-4">
+          <details key={run.id} open className="rounded-2xl border border-ink/10 bg-white p-4 text-ink">
             <summary className="cursor-pointer font-mono text-sm font-bold">Visit {run.session} · {run.steps.length} recorded steps</summary>
             <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
               <figure className="min-w-0">

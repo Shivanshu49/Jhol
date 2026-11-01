@@ -183,10 +183,6 @@ export function AuditForm() {
       </div>
 
       <p className="mt-2 text-[11px] leading-relaxed text-ink/40">
-        OpenAI&apos;s cloud browser can&apos;t open localhost, so audit a public URL or deploy this app to use the test
-        store.
-      </p>
-      <p className="mt-2 text-[11px] leading-relaxed text-ink/40">
         Jhol never pays and never uses real personal data.
       </p>
 
